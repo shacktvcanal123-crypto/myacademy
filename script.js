@@ -1,5 +1,9 @@
 // Interactividad para la aplicación Duolingo Clone
 
+// Variable para guardar el evento de instalación
+let deferredPrompt;
+let installButton;
+
 // Registrar Service Worker para PWA
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
@@ -12,6 +16,95 @@ if ('serviceWorker' in navigator) {
             });
     });
 }
+
+// Capturar el evento beforeinstallprompt
+window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('beforeinstallprompt disparado');
+    // Prevenir que el mini-infobar aparezca en móvil
+    e.preventDefault();
+    // Guardar el evento para usarlo después
+    deferredPrompt = e;
+    // Mostrar el botón de instalación
+    showInstallButton();
+});
+
+// Crear y mostrar el botón de instalación
+function showInstallButton() {
+    // Crear el botón si no existe
+    if (!installButton) {
+        installButton = document.createElement('button');
+        installButton.id = 'install-button';
+        installButton.innerHTML = '<i class="fas fa-download"></i> Instalar App';
+        installButton.style.cssText = `
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: linear-gradient(135deg, #58CC02 0%, #41C282 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10000;
+            box-shadow: 0 4px 15px rgba(88, 204, 2, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        `;
+        
+        // Evento click para instalar
+        installButton.addEventListener('click', async () => {
+            if (!deferredPrompt) {
+                alert('La instalación no está disponible en este momento. Asegúrate de estar usando HTTPS.');
+                return;
+            }
+            
+            // Mostrar el prompt de instalación
+            deferredPrompt.prompt();
+            
+            // Esperar la respuesta del usuario
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`Usuario ${outcome === 'accepted' ? 'aceptó' : 'rechazó'} la instalación`);
+            
+            // Limpiar el prompt guardado
+            deferredPrompt = null;
+            
+            // Ocultar el botón
+            installButton.style.display = 'none';
+        });
+        
+        // Efecto hover
+        installButton.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.1)';
+            this.style.boxShadow = '0 6px 20px rgba(88, 204, 2, 0.6)';
+        });
+        
+        installButton.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+            this.style.boxShadow = '0 4px 15px rgba(88, 204, 2, 0.4)';
+        });
+        
+        document.body.appendChild(installButton);
+    } else {
+        installButton.style.display = 'flex';
+    }
+}
+
+// Detectar cuando la app ya está instalada
+window.addEventListener('appinstalled', () => {
+    console.log('PWA instalada exitosamente');
+    if (installButton) {
+        installButton.style.display = 'none';
+    }
+    // Mostrar notificación de éxito
+    setTimeout(() => {
+        showNotification('✅ ¡App instalada exitosamente!', 'success');
+    }, 1000);
+});
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🦉 Duolingo Clone cargado exitosamente!');

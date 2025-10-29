@@ -757,3 +757,22 @@ body {
     background: #6B7280;
 }
 
+/* Botón de Instalación PWA */
+#install-button {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#install-button:active {
+    transform: scale(0.95) !important;
+}
+
+/* Animación para móviles */
+@media (max-width: 768px) {
+    #install-button {
+        bottom: 90px !important;
+        right: 15px !important;
+        padding: 12px 20px !important;
+        font-size: 14px !important;
+    }
+}
+
