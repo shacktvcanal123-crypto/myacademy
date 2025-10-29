@@ -1,13 +1,14 @@
 // Service Worker básico para PWA
-const CACHE_NAME = 'my-acadey-v1';
+const CACHE_NAME = 'my-acadey-v2';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/script.js',
-  '/manifest.json',
-  '/images/icon_00000.png',
-  '/images/semana1.webm'
+  './',
+  './index.html',
+  './styles.css',
+  './script.js',
+  './manifest.json',
+  './images/icon_00000.png',
+  './images/semana1.webm',
+  './images/sd.png'
 ];
 
 // Instalar service worker
