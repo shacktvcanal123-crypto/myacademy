@@ -1,5 +1,18 @@
 // Interactividad para la aplicación Duolingo Clone
 
+// Registrar Service Worker para PWA
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js')
+            .then(function(registration) {
+                console.log('SW registrado exitosamente:', registration.scope);
+            })
+            .catch(function(registrationError) {
+                console.log('SW falló al registrarse:', registrationError);
+            });
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🦉 Duolingo Clone cargado exitosamente!');
 
