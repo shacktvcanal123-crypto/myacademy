@@ -107,7 +107,7 @@ window.addEventListener('appinstalled', () => {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🦉 Duolingo Clone cargado exitosamente!');
+    console.log('🦉 Academy cargado exitosamente!');
 
     // Elementos del DOM
     const lessonModules = document.querySelectorAll('.lesson-module');
@@ -261,10 +261,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.style.transform = 'scale(1)';
             }, 150);
             
-            // Mostrar notificación según la sección
-            const icon = this.querySelector('i');
-            const sectionName = getSectionName(icon.className);
-            showNotification(`Navegando a ${sectionName}`, 'info');
+            // Obtener la sección
+            const section = this.getAttribute('data-section');
+            
+            // Mostrar/ocultar secciones
+            handleNavigation(section);
         });
     });
 
@@ -281,6 +282,34 @@ document.addEventListener('DOMContentLoaded', function() {
             const rect = this.getBoundingClientRect();
             createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#1CB0F6');
             showNotification('💎 Tienes 770 gemas', 'success');
+        });
+    }
+
+    // Event listener para botón "HAZ UNA LECCIÓN"
+    const doLessonBtn = document.getElementById('doLessonBtn');
+    if (doLessonBtn) {
+        doLessonBtn.addEventListener('click', function() {
+            // Redirigir a la sección de práctica
+            const practiceNav = document.querySelector('.nav-item[data-section="practice"]');
+            if (practiceNav) {
+                practiceNav.click();
+            }
+        });
+    }
+
+    // Event listener para botón "EMPEZAR +10 EXP"
+    const startLessonBtn = document.getElementById('startLessonBtn');
+    if (startLessonBtn) {
+        startLessonBtn.addEventListener('click', function() {
+            // Aquí puedes agregar la lógica para iniciar la lección
+            showNotification('🎉 ¡Lección iniciada! +10 EXP', 'success');
+            
+            // Actualizar EXP del usuario (ejemplo)
+            const userExp = document.querySelector('.user-exp');
+            if (userExp) {
+                const currentExp = parseInt(userExp.textContent) || 0;
+                userExp.textContent = (currentExp + 10) + ' EXP';
+            }
         });
     }
 
@@ -460,12 +489,267 @@ document.addEventListener('DOMContentLoaded', function() {
     // Función para obtener el nombre de la sección
     function getSectionName(iconClass) {
         if (iconClass.includes('fa-home')) return 'Aprender';
-        if (iconClass.includes('fa-book-open')) return 'Historias';
+        if (iconClass.includes('fa-book-open')) return 'Lecciones';
         if (iconClass.includes('fa-dumbbell')) return 'Práctica';
-        if (iconClass.includes('fa-shield-alt')) return 'Ligas';
-        if (iconClass.includes('fa-store')) return 'Tienda';
+        if (iconClass.includes('fa-store')) return 'Clasificación';
         if (iconClass.includes('fa-user')) return 'Perfil';
         return 'Sección';
+    }
+
+    // Variables globales
+    // URL de tu Google Apps Script (usuarios)
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw5Yczns7SocEbmnS9Yi_u6cvdicpn1n4BsTlpO7awYclRnfKY7gWasmJCIrA6FT6AlCA/exec';
+    
+    // Usuario actual (puedes obtenerlo de localStorage o login)
+    let currentUser = {
+        email: localStorage.getItem('userEmail') || 'invitado@ejemplo.com',
+        isAdmin: false
+    };
+
+    // Función para manejar la navegación entre secciones
+    function handleNavigation(section) {
+        const mainContent = document.querySelector('.main-content');
+        const profileSection = document.querySelector('.profile-section');
+        const classificationSection = document.querySelector('.classification-section');
+        const lessonsSection = document.querySelector('.lessons-section');
+        const practiceSection = document.querySelector('.practice-section');
+
+        // Ocultar todas las secciones
+        mainContent.style.display = 'none';
+        if (profileSection) profileSection.style.display = 'none';
+        if (classificationSection) classificationSection.style.display = 'none';
+        if (lessonsSection) lessonsSection.style.display = 'none';
+        if (practiceSection) practiceSection.style.display = 'none';
+
+        if (section === 'profile') {
+            // Mostrar sección de perfil
+            if (profileSection) {
+                profileSection.style.display = 'flex';
+                updateProfileInfo();
+            }
+        } else if (section === 'store') {
+            // Mostrar sección de clasificación
+            if (classificationSection) {
+                classificationSection.style.display = 'flex';
+            }
+        } else if (section === 'stories') {
+            // Mostrar sección de lecciones
+            if (lessonsSection) {
+                lessonsSection.style.display = 'flex';
+            }
+        } else if (section === 'practice') {
+            // Mostrar sección de práctica/repaso
+            if (practiceSection) {
+                practiceSection.style.display = 'block';
+            }
+        } else {
+            // Mostrar contenido principal
+            if (mainContent) {
+                mainContent.style.display = 'flex';
+            }
+        }
+    }
+
+    // Actualizar información del perfil
+    function updateProfileInfo() {
+        const profileName = document.getElementById('profileName');
+        const profileEmail = document.getElementById('profileEmail');
+        const profileRole = document.getElementById('profileRole');
+        const profileBadge = document.querySelector('.profile-badge');
+
+        if (profileEmail) {
+            profileEmail.textContent = currentUser.email;
+        }
+
+        if (profileName) {
+            // Extraer nombre del email
+            const name = currentUser.email.split('@')[0];
+            profileName.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+        }
+
+        if (profileRole) {
+            const rolText = currentUser.isAdmin ? 'Profesor' : 'Alumno';
+            profileRole.textContent = rolText;
+        }
+
+        if (profileBadge) {
+            if (currentUser.isAdmin) {
+                profileBadge.classList.add('admin');
+            } else {
+                profileBadge.classList.remove('admin');
+            }
+        }
+    }
+
+
+    // ===== SISTEMA DE LOGIN =====
+    
+    // Obtener elementos del DOM primero
+    const loginForm = document.getElementById('loginForm');
+    const loginSection = document.querySelector('.login-section');
+    const topBar = document.querySelector('.top-bar');
+    const bottomNav = document.querySelector('.bottom-nav');
+                
+    // Verificar estado de login
+    function checkLoginStatus() {
+        const userEmail = localStorage.getItem('userEmail');
+        const userLoggedIn = localStorage.getItem('userLoggedIn');
+        
+        if (userEmail && userLoggedIn === 'true') {
+            // Usuario ya logueado
+            showMainApp();
+            } else {
+            // Mostrar login
+            showLogin();
+        }
+    }
+
+    // Mostrar pantalla de login
+    function showLogin() {
+        const mainContent = document.querySelector('.main-content');
+        if (loginSection) loginSection.style.display = 'flex';
+        if (mainContent) mainContent.style.display = 'none';
+        if (topBar) topBar.style.display = 'flex';
+        if (bottomNav) bottomNav.style.display = 'none';
+    }
+
+    // Mostrar app principal
+    function showMainApp() {
+        const mainContent = document.querySelector('.main-content');
+        const classificationSection = document.querySelector('.classification-section');
+        const lessonsSection = document.querySelector('.lessons-section');
+        const practiceSection = document.querySelector('.practice-section');
+        if (loginSection) loginSection.style.display = 'none';
+        if (mainContent) mainContent.style.display = 'flex';
+        if (classificationSection) classificationSection.style.display = 'none';
+        if (lessonsSection) lessonsSection.style.display = 'none';
+        if (practiceSection) practiceSection.style.display = 'none';
+        if (topBar) topBar.style.display = 'flex';
+        if (bottomNav) bottomNav.style.display = 'flex';
+    }
+
+    // Verificar login al cargar
+    checkLoginStatus();
+
+    // Manejar submit del formulario de login
+    if (loginForm) {
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const loginError = document.getElementById('loginError');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Deshabilitar botón
+            loginBtn.classList.add('loading');
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Verificando...</span>';
+            
+            // Ocultar error previo
+            loginError.style.display = 'none';
+            
+            try {
+                // Obtener todos los usuarios desde Google Sheets
+                const response = await fetch(GOOGLE_SCRIPT_URL);
+                const result = await response.json();
+                
+                console.log('📥 Respuesta del servidor:', result);
+                
+                if (!result.success) {
+                    throw new Error(result.message || 'Error al conectar con el servidor');
+                }
+                
+                console.log('👥 Usuarios recibidos:', result.data);
+                console.log('🔍 Buscando email:', email.toLowerCase());
+                
+                // Buscar el usuario
+                const usuario = result.data.find(u => 
+                    u.correo.toLowerCase() === email.toLowerCase()
+                );
+                
+                if (!usuario) {
+                    console.error('❌ Usuario no encontrado');
+                    throw new Error('Usuario no encontrado');
+                }
+                
+                console.log('✅ Usuario encontrado:', usuario);
+                
+                // Verificar contraseña (convertir ambos a string para comparar)
+                if (usuario.contraseña.toString() !== password.toString()) {
+                    console.error('❌ Contraseña incorrecta');
+                    throw new Error('Contraseña incorrecta');
+                }
+                
+                // Login exitoso
+                console.log('✅ Login exitoso:', usuario);
+                
+                // Guardar en localStorage
+                localStorage.setItem('userEmail', usuario.correo);
+                localStorage.setItem('userLoggedIn', 'true');
+                localStorage.setItem('userRol', usuario.rol);
+                
+                // Actualizar usuario actual
+                currentUser.email = usuario.correo;
+                const rolLower = usuario.rol.toLowerCase();
+                currentUser.isAdmin = rolLower === 'admin' || rolLower === 'profesor' || rolLower === 'maestro';
+                
+                // Esperar un momento y mostrar la app
+                setTimeout(() => {
+                    showMainApp();
+                }, 500);
+                
+            } catch (error) {
+                console.error('❌ Error en login:', error);
+                
+                // Mostrar error
+                errorMessage.textContent = error.message || 'Error al iniciar sesión';
+                loginError.style.display = 'flex';
+                
+                // Restaurar botón
+                loginBtn.classList.remove('loading');
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<span>Iniciar Sesión</span><i class="fas fa-arrow-right"></i>';
+            }
+        });
+    }
+
+    // Función para cerrar sesión
+    window.logout = function() {
+        if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userLoggedIn');
+            localStorage.removeItem('userRol');
+            
+            // Limpiar usuario actual
+            currentUser = {
+                email: 'invitado@ejemplo.com',
+                isAdmin: false
+            };
+            
+            
+            showLogin();
+            }
+    };
+
+    // Botón de logout
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+            logout();
+        });
+    }
+
+    // Botón de regresar del perfil
+    const profileBackBtn = document.getElementById('profileBackBtn');
+    if (profileBackBtn) {
+        profileBackBtn.addEventListener('click', function() {
+            const mainNavItem = document.querySelector('.nav-item[data-section="main"]');
+            if (mainNavItem) {
+                mainNavItem.click();
+            }
+        });
     }
 
     // Animación de carga inicial
@@ -567,5 +851,99 @@ function drawLessonPath() {
     window.addEventListener('resize', () => {
         drawLessonPath();
     });
+
+    // ===== FUNCIÓN DE REPRODUCCIÓN DE VOZ (TEXT-TO-SPEECH) =====
+    
+    // Función para reproducir texto en inglés
+    function speakText(text, language = 'en-US') {
+        // Cancelar cualquier reproducción anterior
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+        }
+
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = language; // 'en-US' para inglés
+            utterance.rate = 0.9; // Velocidad ligeramente más lenta para mejor comprensión
+            utterance.pitch = 1.0; // Tono normal
+            utterance.volume = 1.0; // Volumen máximo
+            
+            // Seleccionar voz femenina en inglés si está disponible
+            const voices = window.speechSynthesis.getVoices();
+            const englishVoice = voices.find(voice => 
+                voice.lang.startsWith('en') && 
+                (voice.name.includes('Female') || voice.name.includes('Zira') || voice.name.includes('Karen'))
+            ) || voices.find(voice => voice.lang.startsWith('en'));
+            
+            if (englishVoice) {
+                utterance.voice = englishVoice;
+            }
+            
+            window.speechSynthesis.speak(utterance);
+            
+            // Evento cuando termina de hablar
+            utterance.onend = function() {
+                console.log('Pronunciación completada');
+            };
+            
+            // Manejo de errores
+            utterance.onerror = function(event) {
+                console.error('Error al reproducir:', event);
+                showNotification('Error al reproducir la pronunciación', 'warning');
+            };
+        } else {
+            showNotification('Tu navegador no soporta la reproducción de voz', 'warning');
+        }
+    }
+
+    // Cargar voces disponibles cuando estén listas
+    if ('speechSynthesis' in window) {
+        let voicesLoaded = false;
+        
+        function loadVoices() {
+            if (window.speechSynthesis.getVoices().length !== 0) {
+                voicesLoaded = true;
+            }
+        }
+        
+        loadVoices();
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    // Agregar funcionalidad de clic a las tarjetas de vocales
+    const vowelCards = document.querySelectorAll('.vowel-card');
+    vowelCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const exampleWord = this.querySelector('.example-word');
+            if (exampleWord) {
+                const word = exampleWord.textContent.trim();
+                
+                // Efecto visual al hacer clic
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+                
+                // Reproducir la palabra
+                speakText(word, 'en-US');
+                
+                // Mostrar notificación
+                showNotification(`🔊 Pronunciando: ${word}`, 'info');
+            }
+        });
+
+        // Cambiar cursor al pasar el mouse
+        card.style.cursor = 'pointer';
+    });
 }
+
+
+
+
+
+
+
+
+
+
 

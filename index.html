@@ -3,25 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MY ACADEY - Aprende Idiomas</title>
-    
-    <!-- PWA Meta Tags -->
-    <link rel="manifest" href="./manifest.json">
+    <title>Duolingo - Aprende Idiomas</title>
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#41C282">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="MY ACADEY">
-    
-    <!-- Icons -->
-    <link rel="icon" type="image/png" href="./images/icon_00000.png">
-    <link rel="apple-touch-icon" href="./images/icon_00000.png">
-    
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <!-- Barra Superior -->
-    <div class="top-bar">
+    <div class="top-bar" style="display: flex;">
         <div class="top-left">
             <div class="flag">
                 <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='24' viewBox='0 0 32 24'%3E%3Crect width='32' height='24' fill='%233C3B6E'/%3E%3Cpath fill='%23FFF' d='M0,0h32v2H0V0z M0,4h32v2H0V4z M0,8h32v2H0V8z M0,12h32v2H0V12z M0,16h32v2H0V16z M0,20h32v2H0V20z'/%3E%3Crect width='13' height='13' fill='%233C3B6E'/%3E%3Cpath fill='%23FFF' d='M1,1l0.5,1.5L3,2l-1.5,0.5L1,4l-0.5-1.5L-1,2l1.5-0.5L1,1z M5,1l0.5,1.5L7,2l-1.5,0.5L5,4l-0.5-1.5L3,2l1.5-0.5L5,1z M9,1l0.5,1.5L11,2l-1.5,0.5L9,4l-0.5-1.5L7,2l1.5-0.5L9,1z M3,4l0.5,1.5L5,5l-1.5,0.5L3,7l-0.5-1.5L1,5l1.5-0.5L3,4z M7,4l0.5,1.5L9,5l-1.5,0.5L7,7l-0.5-1.5L5,5l1.5-0.5L7,4z M11,4l0.5,1.5L13,5l-1.5,0.5L11,7l-0.5-1.5L9,5l1.5-0.5L11,4z M1,7l0.5,1.5L3,8l-1.5,0.5L1,10l-0.5-1.5L-1,8l1.5-0.5L1,7z M5,7l0.5,1.5L7,8l-1.5,0.5L5,10l-0.5-1.5L3,8l1.5-0.5L5,7z M9,7l0.5,1.5L11,8l-1.5,0.5L9,10l-0.5-1.5L7,8l1.5-0.5L9,7z'/%3E%3C/svg%3E" alt="US Flag">
@@ -71,30 +61,30 @@
             </div>
 
             <!-- Martes - Historia Completada (Derecha) -->
-            <div class="lesson-node" data-position="right" style="top: 70px;">
+            <div class="lesson-node" data-position="right" style="top: 80px;">
                 <div class="lesson-module story">
                     <i class="fas fa-book"></i>
                 </div>
             </div>
 
             <!-- Miércoles - Completado (Izquierda) -->
-            <div class="lesson-node" data-position="left" style="top: 120px;">
+            <div class="lesson-node" data-position="left" style="top: 140px;">
                 <div class="lesson-module completed">
                     <i class="fas fa-check"></i>
                 </div>
             </div>
 
             <!-- Jueves - Personaje Duo (Derecha) -->
-            <div class="duo-character" data-position="right" style="top: 165px; left: 60%;">
-                <video width="100" height="100" autoplay loop muted playsinline>
+            <div class="duo-character" data-position="right" style="top: 200px; left: 60%;">
+                <video width="128" height="128" autoplay loop muted playsinline>
                     <source src="images/semana1.webm" type="video/webm"/>
                 </video>
             </div>
 
             <!-- Viernes - Cofre del Tesoro (Centro) -->
-            <div class="lesson-node" data-position="center" style="top: 170px;">
+            <div class="lesson-node" data-position="center" style="top: 208px;">
                 <div class="treasure-chest">
-                    <svg width="70" height="70" viewBox="0 0 60 60">
+                    <svg width="85" height="85" viewBox="0 0 60 60">
                         <!-- Base del cofre -->
                         <rect x="10" y="25" width="40" height="25" fill="#FFD700" rx="3"/>
                         <rect x="10" y="25" width="40" height="5" fill="#FFA500"/>
@@ -112,14 +102,14 @@
             </div>
 
             <!-- Sábado - Completado (Izquierda) -->
-            <div class="lesson-node" data-position="left" style="top: 220px;">
+            <div class="lesson-node" data-position="left" style="top: 270px;">
                 <div class="lesson-module completed">
                     <i class="fas fa-check"></i>
                 </div>
             </div>
 
             <!-- Domingo - Módulo Actual (Centro) -->
-            <div class="lesson-node" data-position="center" style="top: 290px;">
+            <div class="lesson-node" data-position="center" style="top: 347px;">
                 <div class="lesson-module current">
                     <div class="duo-head">
                         <svg width="60" height="60" viewBox="0 0 50 50">
@@ -138,7 +128,7 @@
             </div>
 
             <!-- Lunes Siguiente - Bloqueado (Derecha) -->
-            <div class="lesson-node" data-position="right" style="top: 380px;">
+            <div class="lesson-node" data-position="right" style="top: 481px;">
                 <div class="lesson-module locked">
                     <i class="fas fa-star"></i>
                 </div>
@@ -152,24 +142,437 @@
         </div>
     </div>
 
+    <!-- Sección de Login -->
+    <div class="login-section" style="display: flex;">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="duo-logo">
+                        <svg width="80" height="80" viewBox="0 0 50 50">
+                            <circle cx="25" cy="25" r="20" fill="#41C282"/>
+                            <circle cx="18" cy="22" r="5" fill="#FFFFFF"/>
+                            <circle cx="32" cy="22" r="5" fill="#FFFFFF"/>
+                            <circle cx="19" cy="23" r="3" fill="#000000"/>
+                            <circle cx="33" cy="23" r="3" fill="#000000"/>
+                            <path d="M25,28 L20,30 L25,32 L30,30 Z" fill="#FF9600"/>
+                        </svg>
+                    </div>
+                    <h1>Academy</h1>
+                    <p>Inicia sesión para continuar</p>
+                </div>
+
+                <form class="login-form" id="loginForm" onsubmit="return false;">
+                    <div class="form-group">
+                        <label for="email">
+                            <i class="fas fa-envelope"></i>
+                            Correo electrónico
+                        </label>
+                        <input type="email" id="email" name="email" placeholder="tu@correo.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock"></i>
+                            Contraseña
+                        </label>
+                        <input type="password" id="password" name="password" placeholder="••••••••" required>
+                    </div>
+
+                    <div class="form-error" id="loginError" style="display: none;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="errorMessage">Error al iniciar sesión</span>
+                    </div>
+
+                    <button type="submit" class="login-btn" id="loginBtn">
+                        <span>Iniciar Sesión</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div class="login-footer">
+                    <p>¿No tienes cuenta? Contacta al administrador</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de Clasificación/Competencia -->
+    <div class="classification-section" style="display: none;">
+        <div class="classification-container">
+            <!-- Header con escudos -->
+            <div class="classification-header">
+                <div class="shield-icons">
+                    <div class="bronze-shield">
+                        <svg width="80" height="80" viewBox="0 0 80 80">
+                            <!-- Escudo bronce -->
+                            <defs>
+                                <linearGradient id="bronzeGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#CD7F32;stop-opacity:1" />
+                                    <stop offset="50%" style="stop-color:#B87333;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#8B6F47;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M40 10 L20 20 L20 45 Q20 60 40 70 Q60 60 60 45 L60 20 Z" fill="url(#bronzeGradient)" stroke="#8B6F47" stroke-width="2"/>
+                            <!-- Pluma dentro del escudo -->
+                            <path d="M35 30 L45 25 L42 35 L50 38 L42 41 L45 51 L35 46 L38 36 Z" fill="#A67C52" opacity="0.8"/>
+                        </svg>
+                    </div>
+                    <div class="locked-shield">
+                        <svg width="60" height="60" viewBox="0 0 60 60">
+                            <path d="M30 5 L15 12 L15 35 Q15 45 30 52 Q45 45 45 35 L45 12 Z" fill="#6B7280" stroke="#4B5563" stroke-width="1.5"/>
+                            <circle cx="30" cy="28" r="3" fill="#374151"/>
+                            <rect x="28" y="28" width="4" height="6" fill="#374151"/>
+                        </svg>
+                    </div>
+                    <div class="locked-shield">
+                        <svg width="60" height="60" viewBox="0 0 60 60">
+                            <path d="M30 5 L15 12 L15 35 Q15 45 30 52 Q45 45 45 35 L45 12 Z" fill="#6B7280" stroke="#4B5563" stroke-width="1.5"/>
+                            <circle cx="30" cy="28" r="3" fill="#374151"/>
+                            <rect x="28" y="28" width="4" height="6" fill="#374151"/>
+                        </svg>
+                    </div>
+                </div>
+                
+                <!-- Título -->
+                <h1 class="classification-title">División Bronce</h1>
+                <p class="classification-subtitle">Completa una lección para unirte a la competencia de esta semana.</p>
+                
+                <!-- Botón -->
+                <button class="lesson-button" id="doLessonBtn">
+                    HAZ UNA LECCIÓN
+                </button>
+            </div>
+            
+            <!-- Lista de clasificación -->
+            <div class="leaderboard">
+                <div class="leaderboard-item">
+                    <div class="position-circle">1</div>
+                    <div class="avatar-circle-placeholder"></div>
+                    <div class="progress-bars">
+                        <div class="progress-bar long"></div>
+                        <div class="progress-bar short"></div>
+                    </div>
+                </div>
+                <div class="leaderboard-item">
+                    <div class="position-circle">2</div>
+                    <div class="avatar-circle-placeholder"></div>
+                    <div class="progress-bars">
+                        <div class="progress-bar long"></div>
+                        <div class="progress-bar short"></div>
+                    </div>
+                </div>
+                <div class="leaderboard-item">
+                    <div class="position-circle">3</div>
+                    <div class="avatar-circle-placeholder"></div>
+                    <div class="progress-bars">
+                        <div class="progress-bar long"></div>
+                        <div class="progress-bar short"></div>
+                    </div>
+                </div>
+                <div class="leaderboard-item">
+                    <div class="position-circle">4</div>
+                    <div class="avatar-circle-placeholder"></div>
+                    <div class="progress-bars">
+                        <div class="progress-bar long"></div>
+                        <div class="progress-bar short"></div>
+                    </div>
+                </div>
+                <div class="leaderboard-item">
+                    <div class="position-circle">5</div>
+                    <div class="avatar-circle-placeholder"></div>
+                    <div class="progress-bars">
+                        <div class="progress-bar long"></div>
+                        <div class="progress-bar short"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Barra inferior del usuario -->
+            <div class="user-bar">
+                <div class="user-info">
+                    <div class="user-avatar-container">
+                        <div class="user-avatar">
+                            <div class="avatar-bg"></div>
+                            <div class="add-friend-icon">
+                                <svg width="20" height="20" viewBox="0 0 20 20">
+                                    <circle cx="10" cy="10" r="9" fill="#60A5FA"/>
+                                    <path d="M10 6 L10 14 M6 10 L14 10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="username">Jesus blocks</span>
+                    <span class="user-exp">0 EXP</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de Lecciones -->
+    <div class="lessons-section" style="display: none;">
+        <div class="lessons-container">
+            <!-- Header -->
+            <div class="lessons-header">
+                <h1 class="lessons-title">¡Mejora tu pronunciación del inglés!</h1>
+                <p class="lessons-subtitle">Entrena tu oído y aprende a pronunciar palabras en inglés</p>
+                
+                <!-- Botón principal -->
+                <button class="start-lesson-btn" id="startLessonBtn">
+                    EMPEZAR +10 EXP
+                </button>
+                
+                <!-- Divisor con título -->
+                <div class="section-divider">
+                    <div class="divider-line"></div>
+                    <span class="divider-title">Vocales</span>
+                    <div class="divider-line"></div>
+                </div>
+            </div>
+            
+            <!-- Grid de vocales -->
+            <div class="vowels-grid">
+                <!-- Fila 1 -->
+                <div class="vowel-card">
+                    <div class="ipa-symbol">ɑ</div>
+                    <div class="example-word">hot</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">æ</div>
+                    <div class="example-word">cat</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">ʌ</div>
+                    <div class="example-word">but</div>
+                    <div class="card-indicator"></div>
+                </div>
+                
+                <!-- Fila 2 -->
+                <div class="vowel-card">
+                    <div class="ipa-symbol">ɛ</div>
+                    <div class="example-word">bed</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">eɪ</div>
+                    <div class="example-word">say</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">ɜ</div>
+                    <div class="example-word">bird</div>
+                    <div class="card-indicator"></div>
+                </div>
+                
+                <!-- Fila 3 -->
+                <div class="vowel-card">
+                    <div class="ipa-symbol">ɪ</div>
+                    <div class="example-word">ship</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">i</div>
+                    <div class="example-word">sheep</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">ə</div>
+                    <div class="example-word">about</div>
+                    <div class="card-indicator"></div>
+                </div>
+                
+                <!-- Fila 4 -->
+                <div class="vowel-card">
+                    <div class="ipa-symbol">oʊ</div>
+                    <div class="example-word">boat</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">ʊ</div>
+                    <div class="example-word">foot</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">u</div>
+                    <div class="example-word">food</div>
+                    <div class="card-indicator"></div>
+                </div>
+                
+                <!-- Fila 5 -->
+                <div class="vowel-card">
+                    <div class="ipa-symbol">aʊ</div>
+                    <div class="example-word">cow</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">aɪ</div>
+                    <div class="example-word">time</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">ɔɪ</div>
+                    <div class="example-word">boy</div>
+                    <div class="card-indicator"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de Práctica/Repaso -->
+    <div class="practice-section" style="display: none;">
+        <div class="practice-container">
+            <!-- Título Repaso de hoy -->
+            <h1 class="practice-title">Repaso de hoy</h1>
+            
+            <!-- Tarjeta Tiro al blanco -->
+            <div class="practice-card target-practice">
+                <div class="super-badge">SUPER</div>
+                <div class="practice-card-content">
+                    <div class="practice-card-left">
+                        <h2 class="practice-card-title">Tiro al blanco</h2>
+                        <p class="practice-card-description">Enfócate en tus áreas débiles</p>
+                        <button class="enable-btn">HABILITAR</button>
+                    </div>
+                    <div class="practice-card-right">
+                        <div class="target-illustration">
+                            <!-- Diana -->
+                            <svg class="target-svg" viewBox="0 0 200 200">
+                                <!-- Anillos de la diana -->
+                                <circle cx="100" cy="100" r="90" fill="#DC2626" stroke="#FFFFFF" stroke-width="4"/>
+                                <circle cx="100" cy="100" r="70" fill="#FFFFFF"/>
+                                <circle cx="100" cy="100" r="50" fill="#DC2626"/>
+                                <circle cx="100" cy="100" r="30" fill="#FFFFFF"/>
+                                <circle cx="100" cy="100" r="15" fill="#DC2626"/>
+                            </svg>
+                            <!-- Criatura verde encima -->
+                            <div class="green-creature"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Título Conversación -->
+            <h1 class="practice-title">Conversación</h1>
+
+            <!-- Tarjeta Hablar -->
+            <div class="practice-card conversation-card">
+                <div class="super-badge">SUPER</div>
+                <div class="practice-card-content">
+                    <div class="practice-card-left">
+                        <h2 class="practice-card-title">Hablar</h2>
+                        <p class="practice-card-description">Mejora tus habilidades de conversación con estas frases</p>
+                    </div>
+                    <div class="practice-card-right">
+                        <div class="microphone-icon">
+                            <svg viewBox="0 0 100 100" width="140" height="140">
+                                <!-- Cuerpo del micrófono -->
+                                <ellipse cx="50" cy="50" rx="20" ry="30" fill="#10B981"/>
+                                <ellipse cx="50" cy="45" rx="18" ry="25" fill="#12D889"/>
+                                <!-- Base -->
+                                <rect x="45" y="70" width="10" height="15" fill="#10B981" rx="2"/>
+                                <!-- Soportes -->
+                                <path d="M38 85 Q45 88, 50 85 Q55 88, 62 85" stroke="#10B981" stroke-width="5" stroke-linecap="round" fill="none"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta Escuchar -->
+            <div class="practice-card conversation-card">
+                <div class="super-badge">SUPER</div>
+                <div class="practice-card-content">
+                    <div class="practice-card-left">
+                        <h2 class="practice-card-title">Escuchar</h2>
+                        <p class="practice-card-description">Impulsa tus habilidades de comprensión con una sesión de</p>
+                    </div>
+                    <div class="practice-card-right">
+                        <div class="headphones-icon">
+                            <svg viewBox="0 0 100 100" width="140" height="140">
+                                <!-- Auricular derecho -->
+                                <circle cx="70" cy="50" r="22" fill="#DC2626" stroke="#FFFFFF" stroke-width="3"/>
+                                <circle cx="70" cy="50" r="14" fill="#EF4444"/>
+                                <!-- Barra de conexión -->
+                                <rect x="68" y="62" width="4" height="22" fill="#DC2626" rx="2"/>
+                                <!-- Diadema -->
+                                <path d="M70 38 Q60 30, 50 32 Q40 30, 30 38" stroke="#DC2626" stroke-width="8" stroke-linecap="round" fill="none"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de Perfil -->
+    <div class="profile-section" style="display: none;">
+        <div class="profile-container">
+            <div class="profile-card">
+                <div class="profile-avatar">
+                    <div class="avatar-circle">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+
+                <div class="profile-info">
+                    <h3 id="profileName">Usuario</h3>
+                    <p id="profileEmail">usuario@ejemplo.com</p>
+                    <span class="profile-badge" id="profileRole">Alumno</span>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-fire"></i>
+                        <div>
+                            <span class="stat-value">0</span>
+                            <span class="stat-label">Días de racha</span>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-gem"></i>
+                        <div>
+                            <span class="stat-value">770</span>
+                            <span class="stat-label">Gemas</span>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-trophy"></i>
+                        <div>
+                            <span class="stat-value">3</span>
+                            <span class="stat-label">Lecciones</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <button class="profile-btn" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Cerrar Sesión</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Barra de Navegación Inferior -->
     <div class="bottom-nav">
-        <div class="nav-item active">
+        <div class="nav-item active" data-section="main">
             <i class="fas fa-home"></i>
         </div>
-        <div class="nav-item">
+        <div class="nav-item" data-section="stories">
             <i class="fas fa-book-open"></i>
         </div>
-        <div class="nav-item">
+        <div class="nav-item" data-section="practice">
             <i class="fas fa-dumbbell"></i>
         </div>
-        <div class="nav-item">
-            <i class="fas fa-shield-alt"></i>
+        <div class="nav-item" data-section="video">
+            <i class="fas fa-video"></i>
         </div>
-        <div class="nav-item">
-            <i class="fas fa-store"></i>
+        <div class="nav-item" data-section="store">
+            <i class="fas fa-medal"></i>
         </div>
-        <div class="nav-item">
+        <div class="nav-item" data-section="profile">
             <i class="fas fa-user"></i>
         </div>
     </div>
