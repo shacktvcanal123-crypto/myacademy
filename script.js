@@ -301,15 +301,272 @@ document.addEventListener('DOMContentLoaded', function() {
     const startLessonBtn = document.getElementById('startLessonBtn');
     if (startLessonBtn) {
         startLessonBtn.addEventListener('click', function() {
-            // Aquí puedes agregar la lógica para iniciar la lección
-            showNotification('🎉 ¡Lección iniciada! +10 EXP', 'success');
-            
-            // Actualizar EXP del usuario (ejemplo)
-            const userExp = document.querySelector('.user-exp');
-            if (userExp) {
-                const currentExp = parseInt(userExp.textContent) || 0;
-                userExp.textContent = (currentExp + 10) + ' EXP';
+            // Abrir ejercicio de pronunciación
+            openPronunciationExercise();
+        });
+    }
+
+    // Función para abrir el ejercicio de pronunciación
+    function openPronunciationExercise() {
+        const exerciseSection = document.querySelector('.pronunciation-exercise');
+        if (exerciseSection) {
+            exerciseSection.style.display = 'flex';
+            // Ocultar mensaje de retroalimentación si está visible
+            const exerciseFeedback = document.getElementById('exerciseFeedback');
+            if (exerciseFeedback) {
+                exerciseFeedback.style.display = 'none';
             }
+            // Mostrar opciones y botón de comprobar
+            const exerciseOptions = document.querySelector('.exercise-options');
+            if (exerciseOptions) {
+                exerciseOptions.style.display = 'flex';
+            }
+            const exerciseCheckBtn = document.getElementById('exerciseCheckBtn');
+            if (exerciseCheckBtn) {
+                exerciseCheckBtn.style.display = 'block';
+            }
+            // Reproducir el audio automáticamente al abrir
+            setTimeout(() => {
+                playExerciseAudio();
+            }, 300);
+        }
+    }
+
+    // Función para cerrar el ejercicio de pronunciación
+    function closePronunciationExercise() {
+        const exerciseSection = document.querySelector('.pronunciation-exercise');
+        if (exerciseSection) {
+            exerciseSection.style.display = 'none';
+            // Resetear el ejercicio
+            resetExercise();
+        }
+    }
+
+    // Botón de cerrar ejercicio
+    const exerciseCloseBtn = document.getElementById('exerciseCloseBtn');
+    if (exerciseCloseBtn) {
+        exerciseCloseBtn.addEventListener('click', function() {
+            closePronunciationExercise();
+        });
+    }
+
+    // Variable para almacenar la palabra correcta
+    let correctWord = 'dock'; // Palabra que se está pronunciando
+
+    // Función para reproducir audio del ejercicio
+    function playExerciseAudio() {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(correctWord);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
+            
+            // Seleccionar voz en inglés si está disponible (misma lógica que las opciones)
+            const voices = window.speechSynthesis.getVoices();
+            const englishVoice = voices.find(voice => 
+                voice.lang.startsWith('en') && voice.name.includes('Female')
+            ) || voices.find(voice => voice.lang.startsWith('en'));
+            
+            if (englishVoice) {
+                utterance.voice = englishVoice;
+            }
+            
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    // Botón de audio del ejercicio
+    const exerciseAudioBtn = document.getElementById('exerciseAudioBtn');
+    if (exerciseAudioBtn) {
+        exerciseAudioBtn.addEventListener('click', function() {
+            playExerciseAudio();
+        });
+    }
+
+    // Variables del ejercicio
+    let selectedOption = null;
+
+    // Funcionalidad de selección de opciones
+    const exerciseOptions = document.querySelectorAll('.exercise-option');
+    const exerciseCheckBtn = document.getElementById('exerciseCheckBtn');
+
+    exerciseOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            // Remover selección anterior
+            exerciseOptions.forEach(opt => opt.classList.remove('selected'));
+            
+            // Seleccionar esta opción
+            this.classList.add('selected');
+            selectedOption = this.getAttribute('data-word');
+            
+            // Reproducir la pronunciación de la palabra seleccionada
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(selectedOption);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.9;
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+                
+                // Seleccionar voz en inglés si está disponible
+                const voices = window.speechSynthesis.getVoices();
+                const englishVoice = voices.find(voice => 
+                    voice.lang.startsWith('en') && voice.name.includes('Female')
+                ) || voices.find(voice => voice.lang.startsWith('en'));
+                
+                if (englishVoice) {
+                    utterance.voice = englishVoice;
+                }
+                
+                window.speechSynthesis.speak(utterance);
+            }
+            
+            // Habilitar botón de comprobar
+            if (exerciseCheckBtn) {
+                exerciseCheckBtn.disabled = false;
+            }
+        });
+    });
+
+    // Botón de comprobar respuesta
+    if (exerciseCheckBtn) {
+        exerciseCheckBtn.addEventListener('click', function() {
+            if (selectedOption === null) return;
+            
+            // Obtener elementos del mensaje de retroalimentación
+            const exerciseFeedback = document.getElementById('exerciseFeedback');
+            const feedbackMessage = exerciseFeedback ? exerciseFeedback.querySelector('.feedback-message') : null;
+            
+            // Verificar si la respuesta es correcta
+            if (selectedOption === correctWord) {
+                // Respuesta correcta
+                // Ocultar opciones y botón de comprobar
+                const exerciseOptionsContainer = document.querySelector('.exercise-options');
+                if (exerciseOptionsContainer) {
+                    exerciseOptionsContainer.style.display = 'none';
+                }
+                exerciseCheckBtn.style.display = 'none';
+                
+                // Cambiar mensaje a éxito
+                if (feedbackMessage) {
+                    feedbackMessage.textContent = 'Muy bien. ¡Repetir los sonidos está funcionando!';
+                    feedbackMessage.style.color = '#58CC02';
+                }
+                
+                // Mostrar botón CONTINUAR
+                const feedbackContinueBtn = document.getElementById('feedbackContinueBtn');
+                if (feedbackContinueBtn) {
+                    feedbackContinueBtn.style.display = 'block';
+                }
+                
+                // Mostrar mensaje de retroalimentación
+                if (exerciseFeedback) {
+                    exerciseFeedback.style.display = 'block';
+                    exerciseFeedback.style.position = 'fixed';
+                    exerciseFeedback.style.bottom = '20px';
+                    exerciseFeedback.style.left = '50%';
+                    exerciseFeedback.style.transform = 'translateX(-50%)';
+                    exerciseFeedback.style.zIndex = '10005';
+                }
+                
+                // Actualizar progreso
+                const progressFill = document.getElementById('exerciseProgress');
+                if (progressFill) {
+                    const currentProgress = parseInt(progressFill.style.width) || 0;
+                    progressFill.style.width = Math.min(currentProgress + 33, 100) + '%';
+                }
+            } else {
+                // Respuesta incorrecta
+                // Cambiar mensaje a error
+                if (feedbackMessage) {
+                    feedbackMessage.textContent = 'Incorrecto. Inténtalo de nuevo';
+                    feedbackMessage.style.color = '#FF4B4B';
+                }
+                
+                // Ocultar botón CONTINUAR
+                const feedbackContinueBtn = document.getElementById('feedbackContinueBtn');
+                if (feedbackContinueBtn) {
+                    feedbackContinueBtn.style.display = 'none';
+                }
+                
+                // Mostrar mensaje de retroalimentación con color de error
+                if (exerciseFeedback) {
+                    exerciseFeedback.style.display = 'block';
+                    exerciseFeedback.style.position = 'fixed';
+                    exerciseFeedback.style.bottom = '20px';
+                    exerciseFeedback.style.left = '50%';
+                    exerciseFeedback.style.transform = 'translateX(-50%)';
+                    exerciseFeedback.style.zIndex = '10005';
+                }
+                
+                // Deseleccionar y resetear
+                const exerciseOptionsEl = document.querySelectorAll('.exercise-option');
+                exerciseOptionsEl.forEach(opt => opt.classList.remove('selected'));
+                selectedOption = null;
+                if (exerciseCheckBtn) {
+                    exerciseCheckBtn.disabled = true;
+                }
+                
+                // Ocultar el mensaje después de 2 segundos
+                setTimeout(() => {
+                    if (exerciseFeedback) {
+                        exerciseFeedback.style.display = 'none';
+                    }
+                }, 2000);
+            }
+        });
+    }
+
+    // Función para resetear el ejercicio
+    function resetExercise() {
+        selectedOption = null;
+        const exerciseOptionsEl = document.querySelectorAll('.exercise-option');
+        exerciseOptionsEl.forEach(opt => opt.classList.remove('selected'));
+        const exerciseCheckBtn = document.getElementById('exerciseCheckBtn');
+        if (exerciseCheckBtn) {
+            exerciseCheckBtn.disabled = true;
+            exerciseCheckBtn.style.display = 'block';
+        }
+        // Ocultar mensaje de retroalimentación
+        const exerciseFeedback = document.getElementById('exerciseFeedback');
+        if (exerciseFeedback) {
+            exerciseFeedback.style.display = 'none';
+        }
+        // Mostrar opciones
+        const exerciseOptionsContainer = document.querySelector('.exercise-options');
+        if (exerciseOptionsContainer) {
+            exerciseOptionsContainer.style.display = 'flex';
+        }
+        const progressFill = document.getElementById('exerciseProgress');
+        if (progressFill) {
+            progressFill.style.width = '0%';
+        }
+        window.speechSynthesis.cancel();
+    }
+
+    // Botón de continuar en el mensaje de retroalimentación
+    const feedbackContinueBtn = document.getElementById('feedbackContinueBtn');
+    if (feedbackContinueBtn) {
+        feedbackContinueBtn.addEventListener('click', function() {
+            // Ocultar mensaje de retroalimentación
+            const exerciseFeedback = document.getElementById('exerciseFeedback');
+            if (exerciseFeedback) {
+                exerciseFeedback.style.display = 'none';
+            }
+            
+            // Mostrar notificación de lección completada
+            if (window.showNotification) {
+                showNotification('🎉 ¡Lección completada! +10 EXP', 'success');
+            }
+            
+            // Cerrar el ejercicio después de un breve delay
+            setTimeout(() => {
+                closePronunciationExercise();
+            }, 1000);
         });
     }
 
@@ -380,8 +637,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Función para mostrar notificaciones
-    function showNotification(message, type) {
+    // Función para mostrar notificaciones (global)
+    window.showNotification = function(message, type) {
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
         notification.textContent = message;
@@ -433,7 +690,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }, 400);
         }, 3000);
-    }
+    };
 
     // Función para crear partículas
     function createParticles(x, y, color) {
@@ -883,13 +1140,18 @@ function drawLessonPath() {
             
             // Evento cuando termina de hablar
             utterance.onend = function() {
-                console.log('Pronunciación completada');
+                // Silencioso - solo se registra si es necesario
             };
             
-            // Manejo de errores
+            // Manejo de errores - ignorar "interrupted" que es normal al cancelar
             utterance.onerror = function(event) {
-                console.error('Error al reproducir:', event);
-                showNotification('Error al reproducir la pronunciación', 'warning');
+                // Solo mostrar errores reales, no "interrupted" (cancelación normal)
+                if (event.error !== 'interrupted' && event.error !== 'canceled') {
+                    console.error('Error al reproducir:', event.error);
+                    if (window.showNotification) {
+                        showNotification('Error al reproducir la pronunciación', 'warning');
+                    }
+                }
             };
         } else {
             showNotification('Tu navegador no soporta la reproducción de voz', 'warning');
@@ -926,9 +1188,6 @@ function drawLessonPath() {
                 
                 // Reproducir la palabra
                 speakText(word, 'en-US');
-                
-                // Mostrar notificación
-                showNotification(`🔊 Pronunciando: ${word}`, 'info');
             }
         });
 

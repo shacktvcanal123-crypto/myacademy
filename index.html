@@ -577,6 +577,47 @@
         </div>
     </div>
 
+    <!-- Sección de Ejercicio de Pronunciación -->
+    <div class="pronunciation-exercise" style="display: none;">
+        <!-- Barra de progreso -->
+        <div class="exercise-progress-bar">
+            <div class="exercise-progress-fill" id="exerciseProgress"></div>
+        </div>
+        
+        <!-- Botón de cerrar (X) -->
+        <button class="exercise-close-btn" id="exerciseCloseBtn">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <div class="exercise-container">
+            <!-- Pregunta -->
+            <h2 class="exercise-question">¿Qué escuchas?</h2>
+
+            <!-- Botón de audio -->
+            <button class="exercise-audio-btn" id="exerciseAudioBtn">
+                <i class="fas fa-volume-up"></i>
+            </button>
+
+            <!-- Opciones de respuesta -->
+            <div class="exercise-options">
+                <button class="exercise-option" data-word="dock">dock</button>
+                <button class="exercise-option" data-word="deck">deck</button>
+            </div>
+
+            <!-- Botón de comprobar -->
+            <button class="exercise-check-btn" id="exerciseCheckBtn" disabled>COMPROBAR</button>
+        </div>
+
+        <!-- Mensaje de retroalimentación (inicialmente oculto) -->
+        <div class="exercise-feedback" id="exerciseFeedback">
+            <div class="feedback-header">
+                <p class="feedback-message">Muy bien. ¡Repetir los sonidos está funcionando!</p>
+                <i class="fas fa-flag feedback-flag"></i>
+            </div>
+            <button class="feedback-continue-btn" id="feedbackContinueBtn">CONTINUAR</button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
