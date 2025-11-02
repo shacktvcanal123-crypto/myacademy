@@ -198,51 +198,52 @@
 
     <!-- Sección de Clasificación/Competencia -->
     <div class="classification-section" style="display: none;">
-        <div class="classification-container">
-            <!-- Header con escudos -->
-            <div class="classification-header">
-                <div class="shield-icons">
-                    <div class="bronze-shield">
-                        <svg width="80" height="80" viewBox="0 0 80 80">
-                            <!-- Escudo bronce -->
-                            <defs>
-                                <linearGradient id="bronzeGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" style="stop-color:#CD7F32;stop-opacity:1" />
-                                    <stop offset="50%" style="stop-color:#B87333;stop-opacity:1" />
-                                    <stop offset="100%" style="stop-color:#8B6F47;stop-opacity:1" />
-                                </linearGradient>
-                            </defs>
-                            <path d="M40 10 L20 20 L20 45 Q20 60 40 70 Q60 60 60 45 L60 20 Z" fill="url(#bronzeGradient)" stroke="#8B6F47" stroke-width="2"/>
-                            <!-- Pluma dentro del escudo -->
-                            <path d="M35 30 L45 25 L42 35 L50 38 L42 41 L45 51 L35 46 L38 36 Z" fill="#A67C52" opacity="0.8"/>
-                        </svg>
-                    </div>
-                    <div class="locked-shield">
-                        <svg width="60" height="60" viewBox="0 0 60 60">
-                            <path d="M30 5 L15 12 L15 35 Q15 45 30 52 Q45 45 45 35 L45 12 Z" fill="#6B7280" stroke="#4B5563" stroke-width="1.5"/>
-                            <circle cx="30" cy="28" r="3" fill="#374151"/>
-                            <rect x="28" y="28" width="4" height="6" fill="#374151"/>
-                        </svg>
-                    </div>
-                    <div class="locked-shield">
-                        <svg width="60" height="60" viewBox="0 0 60 60">
-                            <path d="M30 5 L15 12 L15 35 Q15 45 30 52 Q45 45 45 35 L45 12 Z" fill="#6B7280" stroke="#4B5563" stroke-width="1.5"/>
-                            <circle cx="30" cy="28" r="3" fill="#374151"/>
-                            <rect x="28" y="28" width="4" height="6" fill="#374151"/>
-                        </svg>
-                    </div>
+        <!-- Header Fijo -->
+        <div class="classification-header">
+            <div class="shield-icons">
+                <div class="bronze-shield">
+                    <svg width="80" height="80" viewBox="0 0 80 80">
+                        <!-- Escudo bronce -->
+                        <defs>
+                            <linearGradient id="bronzeGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#CD7F32;stop-opacity:1" />
+                                <stop offset="50%" style="stop-color:#B87333;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#8B6F47;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M40 10 L20 20 L20 45 Q20 60 40 70 Q60 60 60 45 L60 20 Z" fill="url(#bronzeGradient)" stroke="#8B6F47" stroke-width="2"/>
+                        <!-- Pluma dentro del escudo -->
+                        <path d="M35 30 L45 25 L42 35 L50 38 L42 41 L45 51 L35 46 L38 36 Z" fill="#A67C52" opacity="0.8"/>
+                    </svg>
                 </div>
-                
-                <!-- Título -->
-                <h1 class="classification-title">División Bronce</h1>
-                <p class="classification-subtitle">Completa una lección para unirte a la competencia de esta semana.</p>
-                
-                <!-- Botón -->
-                <button class="lesson-button" id="doLessonBtn">
-                    HAZ UNA LECCIÓN
-                </button>
+                <div class="locked-shield">
+                    <svg width="60" height="60" viewBox="0 0 60 60">
+                        <path d="M30 5 L15 12 L15 35 Q15 45 30 52 Q45 45 45 35 L45 12 Z" fill="#6B7280" stroke="#4B5563" stroke-width="1.5"/>
+                        <circle cx="30" cy="28" r="3" fill="#374151"/>
+                        <rect x="28" y="28" width="4" height="6" fill="#374151"/>
+                    </svg>
+                </div>
+                <div class="locked-shield">
+                    <svg width="60" height="60" viewBox="0 0 60 60">
+                        <path d="M30 5 L15 12 L15 35 Q15 45 30 52 Q45 45 45 35 L45 12 Z" fill="#6B7280" stroke="#4B5563" stroke-width="1.5"/>
+                        <circle cx="30" cy="28" r="3" fill="#374151"/>
+                        <rect x="28" y="28" width="4" height="6" fill="#374151"/>
+                    </svg>
+                </div>
             </div>
             
+            <!-- Título -->
+            <h1 class="classification-title">División Bronce</h1>
+            <p class="classification-subtitle">Completa una lección para unirte a la competencia de esta semana.</p>
+            
+            <!-- Botón -->
+            <button class="lesson-button" id="doLessonBtn">
+                HAZ UNA LECCIÓN
+            </button>
+        </div>
+        
+        <!-- Contenido con scroll -->
+        <div class="classification-content">
             <!-- Lista de clasificación -->
             <div class="leaderboard">
                 <div class="leaderboard-item">
@@ -310,23 +311,24 @@
 
     <!-- Sección de Lecciones -->
     <div class="lessons-section" style="display: none;">
-        <div class="lessons-container">
-            <!-- Header -->
-            <div class="lessons-header">
-                <h1 class="lessons-title">¡Mejora tu pronunciación del inglés!</h1>
-                <p class="lessons-subtitle">Entrena tu oído y aprende a pronunciar palabras en inglés</p>
-                
-                <!-- Botón principal -->
-                <button class="start-lesson-btn" id="startLessonBtn">
-                    EMPEZAR +10 EXP
-                </button>
-                
-                <!-- Divisor con título -->
-                <div class="section-divider">
-                    <div class="divider-line"></div>
-                    <span class="divider-title">Vocales</span>
-                    <div class="divider-line"></div>
-                </div>
+        <!-- Header Fijo -->
+        <div class="lessons-header">
+            <h1 class="lessons-title">¡Mejora tu pronunciación del inglés!</h1>
+            <p class="lessons-subtitle">Entrena tu oído y aprende a pronunciar palabras en inglés</p>
+            
+            <!-- Botón principal -->
+            <button class="start-lesson-btn" id="startLessonBtn">
+                EMPEZAR +10 EXP
+            </button>
+        </div>
+        
+        <!-- Contenido con scroll -->
+        <div class="lessons-content">
+            <!-- Divisor con título -->
+            <div class="section-divider">
+                <div class="divider-line"></div>
+                <span class="divider-title">Vocales</span>
+                <div class="divider-line"></div>
             </div>
             
             <!-- Grid de vocales -->
@@ -416,6 +418,152 @@
                     <div class="card-indicator"></div>
                 </div>
             </div>
+            
+            <!-- Divisor con título para consonantes -->
+            <div class="section-divider" style="margin-top: 40px;">
+                <div class="divider-line"></div>
+                <span class="divider-title">Consonantes</span>
+                <div class="divider-line"></div>
+            </div>
+            
+            <!-- Grid de consonantes -->
+            <div class="vowels-grid">
+                <!-- Fila 1 Consonantes -->
+                <div class="vowel-card">
+                    <div class="ipa-symbol">p</div>
+                    <div class="example-word">pen</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">b</div>
+                    <div class="example-word">bad</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">t</div>
+                    <div class="example-word">ten</div>
+                    <div class="card-indicator"></div>
+                </div>
+                
+                <!-- Fila 2 Consonantes -->
+                <div class="vowel-card">
+                    <div class="ipa-symbol">d</div>
+                    <div class="example-word">did</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">k</div>
+                    <div class="example-word">cat</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">g</div>
+                    <div class="example-word">go</div>
+                    <div class="card-indicator"></div>
+                </div>
+                
+                <!-- Fila 3 Consonantes -->
+                <div class="vowel-card">
+                    <div class="ipa-symbol">f</div>
+                    <div class="example-word">five</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">v</div>
+                    <div class="example-word">very</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">θ</div>
+                    <div class="example-word">think</div>
+                    <div class="card-indicator"></div>
+                </div>
+                
+                <!-- Fila 4 Consonantes -->
+                <div class="vowel-card">
+                    <div class="ipa-symbol">ð</div>
+                    <div class="example-word">then</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">s</div>
+                    <div class="example-word">see</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">z</div>
+                    <div class="example-word">zero</div>
+                    <div class="card-indicator"></div>
+                </div>
+                
+                <!-- Fila 5 Consonantes -->
+                <div class="vowel-card">
+                    <div class="ipa-symbol">ʃ</div>
+                    <div class="example-word">ship</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">ʒ</div>
+                    <div class="example-word">vision</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">h</div>
+                    <div class="example-word">hat</div>
+                    <div class="card-indicator"></div>
+                </div>
+                
+                <!-- Fila 6 Consonantes -->
+                <div class="vowel-card">
+                    <div class="ipa-symbol">m</div>
+                    <div class="example-word">man</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">n</div>
+                    <div class="example-word">no</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">ŋ</div>
+                    <div class="example-word">sing</div>
+                    <div class="card-indicator"></div>
+                </div>
+                
+                <!-- Fila 7 Consonantes -->
+                <div class="vowel-card">
+                    <div class="ipa-symbol">l</div>
+                    <div class="example-word">leg</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">r</div>
+                    <div class="example-word">red</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">w</div>
+                    <div class="example-word">wet</div>
+                    <div class="card-indicator"></div>
+                </div>
+                
+                <!-- Fila 8 Consonantes -->
+                <div class="vowel-card">
+                    <div class="ipa-symbol">j</div>
+                    <div class="example-word">yes</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">tʃ</div>
+                    <div class="example-word">chair</div>
+                    <div class="card-indicator"></div>
+                </div>
+                <div class="vowel-card">
+                    <div class="ipa-symbol">dʒ</div>
+                    <div class="example-word">jump</div>
+                    <div class="card-indicator"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -430,9 +578,9 @@
                 <div class="super-badge">SUPER</div>
                 <div class="practice-card-content">
                     <div class="practice-card-left">
-                        <h2 class="practice-card-title">Tiro al blanco</h2>
-                        <p class="practice-card-description">Enfócate en tus áreas débiles</p>
-                        <button class="enable-btn">HABILITAR</button>
+                        <h2 class="practice-card-title">Lista de Verbos</h2>
+                        <p class="practice-card-description">Mejora Tu vocabulario</p>
+                        <button class="enable-btn">ENTRAR</button>
                     </div>
                     <div class="practice-card-right">
                         <div class="target-illustration">
@@ -447,6 +595,35 @@
                             </svg>
                             <!-- Criatura verde encima -->
                             <div class="green-creature"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Título Conversación -->
+            <h1 class="practice-title">Gramática</h1>
+
+            <!-- Tarjeta Verbo To Be -->
+            <div class="practice-card conversation-card verb-to-be-card">
+                <div class="super-badge">SUPER</div>
+                <div class="practice-card-content">
+                    <div class="practice-card-left">
+                        <h2 class="practice-card-title">Verb To Be</h2>
+                        <p class="practice-card-description">Aprende am, is, are, was, were, been con ejemplos</p>
+                        <button class="enable-btn verb-to-be-btn">ENTRAR</button>
+                    </div>
+                    <div class="practice-card-right">
+                        <div class="verb-to-be-icon">
+                            <svg viewBox="0 0 100 100" width="140" height="140">
+                                <!-- Persona -->
+                                <circle cx="50" cy="30" r="15" fill="#FBBF24"/>
+                                <!-- Cuerpo -->
+                                <rect x="45" y="45" width="10" height="25" rx="5" fill="#60A5FA"/>
+                                <!-- Globos de pensamiento -->
+                                <circle cx="70" cy="25" r="8" fill="white"/>
+                                <circle cx="75" cy="20" r="5" fill="white"/>
+                                <circle cx="80" cy="15" r="3" fill="white"/>
+                            </svg>
                         </div>
                     </div>
                 </div>
@@ -505,6 +682,60 @@
         </div>
     </div>
 
+    <!-- Sección de Ejercicio Verbo To Be -->
+    <div class="verb-to-be-exercise" style="display: none;">
+        <!-- Barra de progreso -->
+        <div class="exercise-progress-bar">
+            <div class="exercise-progress-fill" id="verbToBeProgress" style="width: 0%;"></div>
+        </div>
+        
+        <!-- Botón de cerrar (X) -->
+        <button class="exercise-close-btn" id="verbToBeCloseBtn">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <div class="verb-to-be-container">
+            <!-- Imagen del ejercicio -->
+            <div class="verb-to-be-image">
+                <div class="person-illustration">
+                    <svg viewBox="0 0 120 120" width="200" height="200">
+                        <!-- Persona pensativa -->
+                        <circle cx="60" cy="40" r="25" fill="#FBBF24" opacity="0.8"/>
+                        <rect x="50" y="65" width="20" height="35" rx="10" fill="#60A5FA" opacity="0.8"/>
+                        <!-- Globo de pensamiento -->
+                        <circle cx="90" cy="30" r="15" fill="white" opacity="0.9"/>
+                        <circle cx="100" cy="20" r="10" fill="white" opacity="0.9"/>
+                        <circle cx="105" cy="10" r="8" fill="white" opacity="0.9"/>
+                        <!-- Emoji en globo -->
+                        <text x="90" y="35" font-size="20">😊</text>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Título -->
+            <h2 class="verb-to-be-title">VERB TO BE</h2>
+            <p class="verb-to-be-subtitle">Aprende a usar be, was/were, been</p>
+
+            <!-- Botones de selección de forma del verbo -->
+            <div class="verb-form-selector">
+                <button class="verb-form-btn" data-form="present">be (am, is, are)</button>
+                <button class="verb-form-btn" data-form="past">was, were</button>
+                <button class="verb-form-btn" data-form="participle">been</button>
+            </div>
+
+            <!-- Ejemplos -->
+            <div class="verb-examples" id="verbExamples">
+                <!-- Los ejemplos se cargarán dinámicamente -->
+            </div>
+
+            <!-- Botón de reproducir ejemplo -->
+            <button class="verb-play-btn" id="verbPlayBtn" style="display: none;">
+                <i class="fas fa-volume-up"></i>
+                Reproducir ejemplo
+            </button>
+        </div>
+    </div>
+
     <!-- Sección de Perfil -->
     <div class="profile-section" style="display: none;">
         <div class="profile-container">
@@ -555,8 +786,27 @@
         </div>
     </div>
 
+    <!-- Sección de Lista de Verbos -->
+    <div class="verbs-list-section" style="display: none;">
+        <!-- Barra Superior -->
+        <div class="verbs-list-header">
+            <button class="verbs-list-back-btn" id="verbsListBackBtn">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2 class="verbs-list-title">LISTA</h2>
+            <button class="verbs-list-search-btn">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        
+        <!-- Lista de Verbos -->
+        <div class="verbs-list-content" id="verbsListContent">
+            <!-- Los verbos se cargarán dinámicamente aquí -->
+        </div>
+    </div>
+
     <!-- Barra de Navegación Inferior -->
-    <div class="bottom-nav">
+    <div class="bottom-nav" style="display: flex;">
         <div class="nav-item active" data-section="main">
             <i class="fas fa-home"></i>
         </div>
@@ -617,6 +867,7 @@
             <button class="feedback-continue-btn" id="feedbackContinueBtn">CONTINUAR</button>
         </div>
     </div>
+
 
     <script src="script.js"></script>
 </body>

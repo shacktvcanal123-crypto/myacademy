@@ -1356,9 +1356,8 @@ body {
     right: 0;
     bottom: 60px;
     background-color: #1F2937;
-    overflow-y: auto;
-    padding: 20px;
-    padding-bottom: 20px;
+    display: flex;
+    flex-direction: column;
     z-index: 9999;
 }
 
@@ -1375,7 +1374,17 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 20px;
-    margin-bottom: 30px;
+    padding: 20px;
+    padding-bottom: 15px;
+    flex-shrink: 0;
+    background-color: #1F2937;
+    margin-top: 5%;
+}
+
+.classification-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 20px 20px 20px;
 }
 
 .shield-icons {
@@ -1383,7 +1392,6 @@ body {
     align-items: center;
     justify-content: center;
     gap: 15px;
-    margin-top: 20px;
 }
 
 .bronze-shield {
@@ -1607,9 +1615,8 @@ body {
     right: 0;
     bottom: 60px;
     background-color: #1F2937;
-    overflow-y: auto;
-    padding: 20px;
-    padding-bottom: 20px;
+    display: flex;
+    flex-direction: column;
     z-index: 9999;
 }
 
@@ -1623,7 +1630,16 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 20px;
-    margin-bottom: 30px;
+    padding: 20px;
+    padding-bottom: 15px;
+    flex-shrink: 0;
+    background-color: #1F2937;
+}
+
+.lessons-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 20px 20px 20px;
 }
 
 .lessons-title {
@@ -1691,23 +1707,25 @@ body {
 /* Grid de vocales */
 .vowels-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
     margin-top: 20px;
 }
 
 .vowel-card {
     background-color: #374151;
     border: 1px solid #9CA3AF;
-    border-radius: 12px;
-    padding: 20px;
+    border-radius: 8px;
+    padding: 12px 4px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    justify-content: center;
+    gap: 4px;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
+    min-height: 70px;
 }
 
 .vowel-card:hover {
@@ -1717,16 +1735,18 @@ body {
 }
 
 .ipa-symbol {
-    font-size: 32px;
+    font-size: 24px;
     font-weight: bold;
     color: white;
     text-align: center;
+    line-height: 1;
 }
 
 .example-word {
-    font-size: 14px;
+    font-size: 11px;
     color: #9CA3AF;
     text-align: center;
+    line-height: 1;
 }
 
 .card-indicator {
@@ -1739,10 +1759,6 @@ body {
 
 /* Responsive para móviles */
 @media (max-width: 768px) {
-    .vowels-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
     .lessons-title {
         font-size: 24px;
     }
@@ -1809,6 +1825,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    margin-top: 15%;
 }
 
 .practice-card-title {
@@ -1933,6 +1950,18 @@ body {
 }
 
 /* Iconos de conversación */
+.verb-to-be-icon {
+    width: 140px;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.verb-to-be-icon svg {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
 .microphone-icon {
     width: 140px;
     height: 140px;
@@ -1955,6 +1984,236 @@ body {
 
 .headphones-icon svg {
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* ===== SECCIÓN DE LISTA DE VERBOS ===== */
+.verbs-list-section {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 60px;
+    background: #1F2937;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+}
+
+.verbs-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    background-color: #1F2937;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.verbs-list-back-btn,
+.verbs-list-search-btn {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.verbs-list-back-btn:hover,
+.verbs-list-search-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.verbs-list-back-btn:active,
+.verbs-list-search-btn:active {
+    transform: scale(0.95);
+}
+
+.verbs-list-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.verbs-list-section-title {
+    background-color: #374151;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.verbs-list-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+}
+
+.verb-row {
+    display: flex;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background-color 0.2s;
+}
+
+.verb-row:nth-child(odd) {
+    background-color: #374151;
+}
+
+.verb-row:nth-child(even) {
+    background-color: #1F2937;
+}
+
+.verb-row:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.verb-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.verb-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    font-size: 16px;
+}
+
+.verb-form i {
+    font-size: 16px;
+    opacity: 0.7;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.verb-form i:hover {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.verb-translation {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+}
+
+.verb-form-simple {
+    font-size: 16px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Scrollbar personalizado para la lista */
+.verbs-list-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.verbs-list-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.verbs-list-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.verbs-list-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Input de búsqueda de verbos */
+.verb-search-input {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    padding: 12px 20px;
+    background-color: #374151;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 16px;
+    outline: none;
+    z-index: 10;
+}
+
+.verb-search-input::placeholder {
+    color: #9CA3AF;
+}
+
+.verbs-list-content.verb-search-active {
+    padding-top: 112px;
+}
+
+/* Responsive para lista de verbos */
+@media (max-width: 768px) {
+    .verbs-list-header {
+        padding: 12px 16px;
+    }
+    
+    .verbs-list-title {
+        font-size: 20px;
+    }
+    
+    .verb-row {
+        padding: 10px 14px;
+    }
+    
+    .verb-form {
+        font-size: 14px;
+    }
+    
+    .verb-translation {
+        font-size: 12px;
+    }
+    
+    .verb-search-input {
+        top: 60px;
+    }
+    
+    .verbs-list-content.verb-search-active {
+        padding-top: 112px;
+    }
+}
+
+@media (max-width: 480px) {
+    .verbs-list-header {
+        padding: 10px 12px;
+    }
+    
+    .verbs-list-title {
+        font-size: 18px;
+    }
+    
+    .verb-row {
+        padding: 8px 12px;
+    }
+    
+    .verb-form {
+        font-size: 13px;
+    }
+    
+    .verb-form i {
+        font-size: 14px;
+    }
 }
 
 /* Responsive para práctica */
@@ -2336,5 +2595,228 @@ body {
     .feedback-continue-btn {
         padding: 12px;
         font-size: 15px;
+    }
+}
+
+/* ===== SECCIÓN DE EJERCICIO VERB TO BE ===== */
+.verb-to-be-exercise {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #1F2937;
+    z-index: 10002;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px;
+    padding-top: 40px;
+    overflow-y: auto;
+}
+
+.verb-to-be-container {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    position: relative;
+    margin-top: 10px;
+}
+
+.verb-to-be-image {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.person-illustration {
+    position: relative;
+}
+
+.verb-to-be-title {
+    font-size: 32px;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.verb-to-be-subtitle {
+    font-size: 18px;
+    color: #9CA3AF;
+    text-align: center;
+    margin: 0;
+}
+
+.verb-form-selector {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.verb-form-btn {
+    flex: 1;
+    min-width: 150px;
+    padding: 18px 24px;
+    background-color: #374151;
+    border: 2px solid #9CA3AF;
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.verb-form-btn:hover {
+    background-color: #4B5563;
+    border-color: #D1D5DB;
+    transform: translateY(-2px);
+}
+
+.verb-form-btn.active {
+    background: linear-gradient(135deg, #60A5FA, #3B82F6);
+    border-color: #60A5FA;
+    box-shadow: 0 4px 12px rgba(96, 165, 250, 0.4);
+}
+
+.verb-examples {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.verb-example-item {
+    background-color: #374151;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+}
+
+.verb-example-item:hover {
+    background-color: #4B5563;
+}
+
+.verb-example-text {
+    flex: 1;
+    font-size: 18px;
+    color: white;
+    line-height: 1.6;
+}
+
+.verb-example-translation {
+    font-size: 14px;
+    color: #9CA3AF;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+.verb-example-play-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: #60A5FA;
+    border-radius: 50%;
+    color: white;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.verb-example-item:hover .verb-example-play-icon {
+    background-color: #3B82F6;
+    transform: scale(1.1);
+}
+
+.verb-play-btn {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, #60A5FA, #3B82F6);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+    box-shadow: 0 4px 12px rgba(96, 165, 250, 0.4);
+}
+
+.verb-play-btn:hover {
+    background: linear-gradient(135deg, #3B82F6, #2563EB);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(96, 165, 250, 0.5);
+}
+
+.verb-play-btn:active {
+    transform: translateY(0);
+}
+
+.verb-play-btn i {
+    font-size: 20px;
+}
+
+/* Responsive para ejercicio Verb To Be */
+@media (max-width: 768px) {
+    .verb-to-be-container {
+        max-width: 100%;
+        gap: 20px;
+    }
+    
+    .verb-to-be-title {
+        font-size: 24px;
+    }
+    
+    .verb-form-selector {
+        flex-direction: column;
+    }
+    
+    .verb-form-btn {
+        min-width: 100%;
+    }
+    
+    .verb-example-text {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .verb-to-be-title {
+        font-size: 20px;
+    }
+    
+    .verb-to-be-subtitle {
+        font-size: 14px;
+    }
+    
+    .verb-example-text {
+        font-size: 14px;
+    }
+    
+    .verb-play-btn {
+        padding: 16px;
+        font-size: 16px;
     }
 }
