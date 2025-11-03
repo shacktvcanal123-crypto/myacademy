@@ -512,6 +512,9 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('📦 Verbos cargados desde localStorage');
             verbsListContent.innerHTML = cachedVerbsHtml;
             
+            // Configurar event listeners para los botones de audio
+            setupVerbAudioListeners(verbsListContent);
+            
             // Actualizar en background sin mostrar loading
             fetchAndUpdateVerbs(true);
             return;
@@ -567,23 +570,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 const simplePastLower = simplePast.toLowerCase();
                 const pastParticipleLower = pastParticiple.toLowerCase();
 
+                // Escapar comillas y caracteres especiales para evitar problemas en HTML
+                const escapeHtml = (text) => {
+                    return text.replace(/'/g, "&#39;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                };
+
                 verbRow.innerHTML = `
                     <div class="verb-column">
                         <div class="verb-form">
-                            <i class="fas fa-volume-up" onclick="speakWord('${simpleFormLower}')"></i>
+                            <i class="fas fa-volume-up verb-speak-btn" data-word="${escapeHtml(simpleFormLower)}" style="cursor: pointer;"></i>
                             <span>${simpleForm.charAt(0) + simpleForm.slice(1).toLowerCase()}</span>
                         </div>
                         ${translation ? `<div class="verb-translation">${translation}</div>` : ''}
                     </div>
                     <div class="verb-column">
                         <div class="verb-form-simple">
-                            <i class="fas fa-volume-up" onclick="speakWord('${simplePastLower}')"></i>
+                            <i class="fas fa-volume-up verb-speak-btn" data-word="${escapeHtml(simplePastLower)}" style="cursor: pointer;"></i>
                             <span>${simplePast}</span>
                         </div>
                     </div>
                     <div class="verb-column">
                         <div class="verb-form-simple">
-                            <i class="fas fa-volume-up" onclick="speakWord('${pastParticipleLower}')"></i>
+                            <i class="fas fa-volume-up verb-speak-btn" data-word="${escapeHtml(pastParticipleLower)}" style="cursor: pointer;"></i>
                             <span>${pastParticiple}</span>
                         </div>
                     </div>
@@ -626,6 +634,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Solo actualizar la UI si no es background update
             if (!backgroundUpdate && verbsListContent) {
                 verbsListContent.innerHTML = tempContainer.innerHTML;
+                
+                // Configurar event listeners para los botones de audio usando event delegation
+                setupVerbAudioListeners(verbsListContent);
             }
 
         } catch (error) {
@@ -636,9 +647,41 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (cachedVerbsHtml) {
                     console.log('⚠️ Usando verbos de cache debido al error');
                     verbsListContent.innerHTML = cachedVerbsHtml;
+                    
+                    // Configurar event listeners para los botones de audio
+                    setupVerbAudioListeners(verbsListContent);
                 } else {
                     verbsListContent.innerHTML = '<div style="text-align: center; padding: 20px; color: white;">Error al cargar los verbos. Inténtalo más tarde.</div>';
                 }
+            }
+        }
+    }
+
+    // Función para configurar event listeners de audio para verbos usando event delegation
+    function setupVerbAudioListeners(container) {
+        if (!container) return;
+        
+        // Remover listeners anteriores si existen
+        container.removeEventListener('click', handleVerbAudioClick);
+        
+        // Agregar nuevo listener usando event delegation
+        container.addEventListener('click', handleVerbAudioClick);
+    }
+    
+    // Función manejadora de clics para botones de audio de verbos
+    function handleVerbAudioClick(e) {
+        // Verificar si el clic fue en un botón de audio
+        const button = e.target.closest('.verb-speak-btn');
+        if (button) {
+            const word = button.getAttribute('data-word');
+            if (word && window.speakWord) {
+                // Decodificar HTML entities
+                const decodedWord = word
+                    .replace(/&#39;/g, "'")
+                    .replace(/&quot;/g, '"')
+                    .replace(/&lt;/g, '<')
+                    .replace(/&gt;/g, '>');
+                window.speakWord(decodedWord);
             }
         }
     }
@@ -1449,6 +1492,36 @@ document.addEventListener('DOMContentLoaded', function() {
         isAdmin: false
     };
 
+    // Cerrar overlays/modales y secciones especiales
+    function closeAllOverlays() {
+        // Cerrar detalle de lección
+        const lessonDetailSection = document.querySelector('.lesson-detail-section');
+        if (lessonDetailSection) lessonDetailSection.style.display = 'none';
+        // Limpiar historial de lecciones al cerrar overlays
+        try { lessonHistory = []; isNavigatingHistory = false; } catch (_) {}
+
+        // Cerrar ejercicio de pronunciación
+        const pronunciationExercise = document.querySelector('.pronunciation-exercise');
+        if (pronunciationExercise) pronunciationExercise.style.display = 'none';
+
+        // Cerrar Verb To Be exercise
+        const verbToBeExercise = document.querySelector('.verb-to-be-exercise');
+        if (verbToBeExercise) verbToBeExercise.style.display = 'none';
+
+        // Cerrar lista de verbos
+        const verbsListSection = document.querySelector('.verbs-list-section');
+        if (verbsListSection) verbsListSection.style.display = 'none';
+
+        // Cerrar videollamada
+        const videoCallSection = document.querySelector('.video-call-section');
+        if (videoCallSection) videoCallSection.style.display = 'none';
+
+        // Parar cualquier TTS en curso
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+        }
+    }
+
     // Función para manejar la navegación entre secciones
     function handleNavigation(section) {
         const mainContent = document.querySelector('.main-content');
@@ -1456,40 +1529,1441 @@ document.addEventListener('DOMContentLoaded', function() {
         const classificationSection = document.querySelector('.classification-section');
         const lessonsSection = document.querySelector('.lessons-section');
         const practiceSection = document.querySelector('.practice-section');
+        const videoCallSection = document.querySelector('.video-call-section');
 
-        // Ocultar todas las secciones
-        mainContent.style.display = 'none';
+        // Cerrar cualquier overlay activo
+        closeAllOverlays();
+
+        // Ocultar todas las secciones base
+        if (mainContent) mainContent.style.display = 'none';
         if (profileSection) profileSection.style.display = 'none';
         if (classificationSection) classificationSection.style.display = 'none';
         if (lessonsSection) lessonsSection.style.display = 'none';
         if (practiceSection) practiceSection.style.display = 'none';
+        if (videoCallSection) videoCallSection.style.display = 'none';
 
+        // Mostrar sección objetivo
         if (section === 'profile') {
-            // Mostrar sección de perfil
             if (profileSection) {
                 profileSection.style.display = 'flex';
                 updateProfileInfo();
             }
         } else if (section === 'store') {
-            // Mostrar sección de clasificación
-            if (classificationSection) {
-                classificationSection.style.display = 'flex';
-            }
+            if (classificationSection) classificationSection.style.display = 'flex';
         } else if (section === 'stories') {
-            // Mostrar sección de lecciones
-            if (lessonsSection) {
-                lessonsSection.style.display = 'flex';
-            }
+            if (lessonsSection) lessonsSection.style.display = 'flex';
         } else if (section === 'practice') {
-            // Mostrar sección de práctica/repaso
             if (practiceSection) {
                 practiceSection.style.display = 'block';
+                // Solo construir si no se ha hecho aún
+                if (typeof loadLessons === 'function') {
+                    loadLessons();
+                }
+                // Asegurar que la vista de práctica inicie arriba
+                try { practiceSection.scrollTop = 0; } catch (_) {}
+                const practiceContainer = document.querySelector('.practice-container');
+                if (practiceContainer) {
+                    try { practiceContainer.scrollTop = 0; } catch (_) {}
+                }
+                try { window.scrollTo({ top: 0, behavior: 'instant' }); } catch (_) { try { window.scrollTo(0, 0); } catch (_) {} }
             }
+        } else if (section === 'video') {
+            if (videoCallSection) videoCallSection.style.display = 'flex';
         } else {
-            // Mostrar contenido principal
-            if (mainContent) {
-                mainContent.style.display = 'flex';
+            if (mainContent) mainContent.style.display = 'flex';
+        }
+    }
+
+    // URL de Google Apps Script para lecciones
+    const LESSONS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzwcW3HIeNSdIpFLPuKzeXW1oj96ZMl5VymbLLQ59sOXvUdoIl1PWdwFpA265DZYhHp/exec';
+
+    // Función para cargar lecciones dinámicamente
+    let lessonsBuilt = false;
+    async function loadLessons() {
+        if (lessonsBuilt) return; // evitar reconstruir si ya se generaron
+        const practiceContainer = document.querySelector('.practice-container');
+        if (!practiceContainer) return;
+
+        // Eliminar contenedor de lecciones dinámicas si existe
+        const existingLessonsContainer = document.getElementById('dynamicLessonsContainer');
+        if (existingLessonsContainer) {
+            existingLessonsContainer.remove();
+        }
+
+        try {
+            // Cargar lecciones desde Google Apps Script
+            const response = await fetch(LESSONS_SCRIPT_URL);
+            const result = await response.json();
+
+            if (!result.success || !result.data || result.data.length === 0) {
+                console.error('No se pudieron cargar las lecciones');
+                return;
             }
+
+            const lessons = result.data;
+
+            // Agrupar lecciones por tema_general
+            const groupedLessons = {};
+            lessons.forEach(lesson => {
+                const tema = lesson.tema_general || 'General';
+                if (!groupedLessons[tema]) {
+                    groupedLessons[tema] = [];
+                }
+                groupedLessons[tema].push(lesson);
+            });
+
+            // Crear contenedor para lecciones dinámicas
+            const lessonsContainer = document.createElement('div');
+            lessonsContainer.id = 'dynamicLessonsContainer';
+
+            // Iterar sobre cada tema general
+            Object.keys(groupedLessons).forEach(temaGeneral => {
+                // Crear título del tema
+                const title = document.createElement('h1');
+                title.className = 'practice-title';
+                title.textContent = temaGeneral;
+                lessonsContainer.appendChild(title);
+
+                // Crear tarjetas para cada subtema
+                groupedLessons[temaGeneral].forEach((lesson, index) => {
+                    const card = createLessonCard(lesson);
+                    lessonsContainer.appendChild(card);
+                });
+            });
+
+            // Agregar al final del contenedor de práctica
+            practiceContainer.appendChild(lessonsContainer);
+
+            // Marcar como construido para no recargar en siguientes visitas
+            lessonsBuilt = true;
+
+        } catch (error) {
+            console.error('Error al cargar lecciones:', error);
+        }
+    }
+
+    // Construir dinámicamente la ruta de lecciones (Units) en la sección principal
+    /* removed buildUnitsPath per user request */
+    /* async function buildUnitsPath() {
+        const pathContainer = document.querySelector('.lesson-path');
+        if (!pathContainer) return;
+
+        // Obtener lecciones del cache o desde el endpoint
+        let lessons = [];
+        try {
+            const cached = localStorage.getItem('lessonsData');
+            if (cached) lessons = JSON.parse(cached);
+        } catch (_) {}
+        if (!lessons || lessons.length === 0) {
+            try {
+                const resp = await fetch(LESSONS_SCRIPT_URL);
+                const res = await resp.json();
+                if (res && res.success && res.data) {
+                    lessons = res.data;
+                    try { localStorage.setItem('lessonsData', JSON.stringify(lessons)); } catch (_) {}
+                }
+            } catch (_) {}
+        }
+
+        if (!lessons || lessons.length === 0) return;
+
+        // Extraer Units únicas en orden de aparición
+        const unitOrder = [];
+        const unitSet = new Set();
+        lessons.forEach(l => {
+            const u = (l.unit || '').toString().trim();
+            if (u && !unitSet.has(u)) { unitSet.add(u); unitOrder.push(u); }
+        });
+        if (unitOrder.length === 0) return;
+
+        // Progreso actual guardado
+        let currentUnitIndex = 0;
+        try {
+            const stored = localStorage.getItem('currentUnitIndex');
+            if (stored !== null) currentUnitIndex = Math.max(0, Math.min(unitOrder.length - 1, parseInt(stored, 10)));
+        } catch (_) {}
+
+        // Limpiar nodos previos (mantener la SVG del path si existe)
+        const children = Array.from(pathContainer.children);
+        children.forEach(ch => {
+            if (!ch.classList || (!ch.classList.contains('path-line') && !ch.matches('svg.path-line'))) {
+                pathContainer.removeChild(ch);
+            }
+        });
+
+        // Asegurar existir la línea del camino
+        let pathSvg = pathContainer.querySelector('svg.path-line');
+        if (!pathSvg) {
+            pathSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            pathSvg.setAttribute('class', 'path-line');
+            pathSvg.setAttribute('width', '100%');
+            pathSvg.setAttribute('height', '100%');
+            pathSvg.setAttribute('style', 'position: absolute; top: 0; left: 0; pointer-events: none;');
+            const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            p.setAttribute('class', 'path-stroke');
+            p.setAttribute('fill', 'none');
+            p.setAttribute('stroke', '#374151');
+            p.setAttribute('stroke-width', '18');
+            p.setAttribute('stroke-linecap', 'round');
+            p.setAttribute('d', '');
+            pathSvg.appendChild(p);
+            pathContainer.appendChild(pathSvg);
+        }
+
+        // Generar nodos por Unit
+        const positions = ['center', 'right', 'left'];
+        let top = 20; // px inicial
+        const topStep = 60; // separación vertical
+
+        unitOrder.forEach((unitName, idx) => {
+            const node = document.createElement('div');
+            node.className = 'lesson-node';
+            const pos = positions[idx % positions.length];
+            node.setAttribute('data-position', pos);
+            node.setAttribute('style', `top: ${top}px;`);
+
+            const module = document.createElement('div');
+            let moduleClass = 'lesson-module ';
+            if (idx < currentUnitIndex) moduleClass += 'completed';
+            else if (idx === currentUnitIndex) moduleClass += 'current';
+            else moduleClass += 'locked';
+            module.className = moduleClass;
+
+            // Ícono según estado
+            if (moduleClass.includes('completed')) {
+                module.innerHTML = '<i class="fas fa-check"></i>';
+            } else if (moduleClass.includes('locked')) {
+                module.innerHTML = '<i class="fas fa-star"></i>';
+            } else {
+                // current: cabeza duo + número de unidad
+                const head = document.createElement('div');
+                head.className = 'duo-head';
+                head.innerHTML = '<svg width="60" height="60" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="#41C282"></circle><circle cx="18" cy="22" r="5" fill="#FFFFFF"></circle><circle cx="32" cy="22" r="5" fill="#FFFFFF"></circle><circle cx="19" cy="23" r="3" fill="#000000"></circle><circle cx="33" cy="23" r="3" fill="#000000"></circle><path d="M25,28 L20,30 L25,32 L30,30 Z" fill="#FF9600"></path></svg>';
+                module.appendChild(head);
+                const num = document.createElement('div');
+                num.className = 'lesson-number';
+                num.textContent = (idx + 1).toString();
+                module.appendChild(num);
+            }
+
+            // Click: abrir primera lección de la unidad si está disponible (no locked)
+            module.addEventListener('click', function() {
+                if (moduleClass.includes('locked')) return;
+                const unitLessons = lessons.filter(l => (l.unit || '').toString().trim() === unitName);
+                if (unitLessons && unitLessons.length > 0) {
+                    // Abrir la primera lección de la unidad
+                    openLesson(unitLessons[0]);
+                }
+            });
+
+            node.appendChild(module);
+            pathContainer.appendChild(node);
+            top += topStep;
+        });
+
+        // Opcional: colocar un cofre al final
+        const chestNode = document.createElement('div');
+        chestNode.className = 'lesson-node';
+        chestNode.setAttribute('data-position', 'center');
+        chestNode.setAttribute('style', `top: ${top + 20}px;`);
+        const chest = document.createElement('div');
+        chest.className = 'treasure-chest';
+        chest.innerHTML = '<img src="images/cofre1.png" width="64" height="64" alt="Treasure Chest"/>';
+        chestNode.appendChild(chest);
+        pathContainer.appendChild(chestNode);
+    } */
+
+    // Función para crear una tarjeta de lección
+    function createLessonCard(lesson) {
+        const card = document.createElement('div');
+        card.className = 'practice-card conversation-card';
+        card.style.cursor = 'pointer';
+
+        // Iconos SVG según el tema (simplificado, puedes personalizar)
+        const getIconSvg = () => {
+            const tema = (lesson.tema_general || '').toLowerCase();
+            if (tema.includes('verb')) {
+                return `
+                    <svg viewBox="0 0 100 100" width="140" height="140">
+                        <circle cx="50" cy="30" r="15" fill="#FBBF24"/>
+                        <rect x="45" y="45" width="10" height="25" rx="5" fill="#60A5FA"/>
+                        <circle cx="70" cy="25" r="8" fill="white"/>
+                        <circle cx="75" cy="20" r="5" fill="white"/>
+                        <circle cx="80" cy="15" r="3" fill="white"/>
+                    </svg>
+                `;
+            } else if (tema.includes('noun')) {
+                return `
+                    <svg viewBox="0 0 100 100" width="140" height="140">
+                        <rect x="30" y="30" width="40" height="40" rx="5" fill="#10B981"/>
+                        <rect x="35" y="35" width="30" height="30" rx="3" fill="#12D889"/>
+                        <circle cx="50" cy="50" r="5" fill="white"/>
+                    </svg>
+                `;
+            } else if (tema.includes('adjective')) {
+                return `
+                    <svg viewBox="0 0 100 100" width="140" height="140">
+                        <rect x="20" y="40" width="60" height="20" rx="10" fill="#8B5CF6"/>
+                        <rect x="25" y="45" width="50" height="10" rx="5" fill="#A78BFA"/>
+                        <circle cx="50" cy="50" r="8" fill="white"/>
+                    </svg>
+                `;
+            } else {
+                return `
+                    <svg viewBox="0 0 100 100" width="140" height="140">
+                        <rect x="25" y="25" width="50" height="50" rx="10" fill="#3B82F6"/>
+                        <rect x="30" y="30" width="40" height="40" rx="5" fill="#60A5FA"/>
+                        <circle cx="50" cy="50" r="10" fill="white"/>
+                    </svg>
+                `;
+            }
+        };
+
+        card.innerHTML = `
+            <div class="super-badge">SUPER</div>
+            <div class="practice-card-content">
+                <div class="practice-card-left">
+                    <h2 class="practice-card-title">${lesson.subtema || 'Lección'}</h2>
+                    <p class="practice-card-description">${lesson.descripcion || ''}</p>
+                    <button class="enable-btn lesson-btn" data-unit="${lesson.unit}" data-tema="${lesson.tema_general}" data-subtema="${lesson.subtema}">ENTRAR</button>
+                </div>
+                <div class="practice-card-right">
+                    <div class="lesson-icon">
+                        ${getIconSvg()}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Event listener para el botón
+        const btn = card.querySelector('.lesson-btn');
+        if (btn) {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                openLesson(lesson);
+            });
+        }
+
+        // Event listener para toda la tarjeta
+        card.addEventListener('click', function() {
+            openLesson(lesson);
+        });
+
+        return card;
+    }
+
+    // Historial de lecciones abiertas
+    let lessonHistory = [];
+    let isNavigatingHistory = false;
+
+    // Función para abrir una lección
+    function openLesson(lesson) {
+        console.log('Abrir lección:', lesson);
+        // Registrar en historial si no es navegación desde back
+        if (!isNavigatingHistory) {
+            lessonHistory.push(lesson);
+        }
+        // Resetear flag por si quedó activo
+        isNavigatingHistory = false;
+        
+        // Ocultar sección de práctica
+        const practiceSection = document.querySelector('.practice-section');
+        if (practiceSection) {
+            practiceSection.style.display = 'none';
+        }
+
+        // Mostrar sección de lección detallada
+        const lessonDetailSection = document.querySelector('.lesson-detail-section');
+        if (lessonDetailSection) {
+            lessonDetailSection.style.display = 'block';
+            // Resetear scroll al inicio de la vista de lección
+            try { lessonDetailSection.scrollTop = 0; } catch (_) {}
+            try { window.scrollTo({ top: 0, behavior: 'instant' }); } catch (_) { try { window.scrollTo(0, 0); } catch (_) {} }
+            
+            // Generar y mostrar contenido de la lección
+            const lessonContent = document.getElementById('lessonContent');
+            if (lessonContent) {
+                lessonContent.innerHTML = generateLessonContent(lesson);
+                // Asegurar scroll arriba del contenedor de contenido
+                try { lessonContent.scrollTop = 0; } catch (_) {}
+            }
+            
+            // Configurar event listeners después de crear el contenido
+            setupLessonEventListeners();
+        }
+    }
+
+    // Función para generar el contenido HTML de la lección
+    function generateLessonContent(lesson) {
+        const tema = lesson.tema_general || '';
+        const subtema = lesson.subtema || '';
+        
+        // Obtener contenido generado dinámicamente basado en tema y subtema
+        const content = getLessonContent(tema, subtema);
+        
+        let html = `
+            <div class="lesson-header">
+                <div class="lesson-badge">${lesson.unit || ''}</div>
+                <h1 class="lesson-main-title">${tema}</h1>
+                <h2 class="lesson-subtitle">${subtema}</h2>
+            </div>
+            
+            <div class="lesson-body">
+        `;
+
+        // Agregar descripción inicial
+        if (content.intro) {
+            html += `<div class="lesson-intro">${content.intro}</div>`;
+        }
+
+        // Agregar secciones/tablas
+        if (content.sections && content.sections.length > 0) {
+            content.sections.forEach(section => {
+                html += `<div class="lesson-section">`;
+                html += `<h3 class="section-title">${section.title}</h3>`;
+                
+                if (section.table) {
+                    html += `<table class="lesson-table">`;
+                    html += `<thead><tr>`;
+                    section.table.headers.forEach(header => {
+                        html += `<th>${header}</th>`;
+                    });
+                    html += `</tr></thead>`;
+                    html += `<tbody>`;
+                    // Helper para extraer el texto en inglés de una celda de ejemplo
+                    const extractEnglishFromCell = (cellHtml) => {
+                        const tmp = document.createElement('div');
+                        tmp.innerHTML = cellHtml;
+                        const text = tmp.textContent || tmp.innerText || '';
+                        // Si contiene traducción entre paréntesis, tomar lo anterior
+                        const beforeParen = text.split('(')[0].trim();
+                        // Si tiene saltos (por ejemplo con ejemplos múltiples), tomar la primera línea
+                        const firstLine = beforeParen.split('\n')[0].split('  ')[0].split(' - ')[0].trim();
+                        return firstLine;
+                    };
+
+                    section.table.rows.forEach(row => {
+                        html += `<tr>`;
+                        row.forEach((cell, ci) => {
+                            const header = (section.table.headers && section.table.headers[ci]) ? section.table.headers[ci].toString().toLowerCase() : '';
+                            if (header.includes('ejemplo')) {
+                                const english = extractEnglishFromCell(cell);
+                                // Escapar comillas y caracteres especiales para evitar problemas en HTML
+                                const escapeHtml = (text) => {
+                                    return text.replace(/'/g, "&#39;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                                };
+                                const safeWord = escapeHtml(english);
+                                html += `<td>${cell} <button class="table-play-btn" title="Escuchar" data-word="${safeWord}" style="margin-left:8px;background:#60A5FA;border:none;border-radius:50%;width:28px;height:28px;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;"><i class="fas fa-volume-up"></i></button></td>`;
+                            } else {
+                                html += `<td>${cell}</td>`;
+                            }
+                        });
+                        html += `</tr>`;
+                    });
+                    html += `</tbody></table>`;
+                }
+                
+                if (section.content) {
+                    html += `<div class="section-content">${section.content}</div>`;
+                }
+                
+                html += `</div>`;
+            });
+        }
+
+        // Agregar notas
+        if (content.notes && content.notes.length > 0) {
+            content.notes.forEach(note => {
+                html += `<div class="lesson-note">`;
+                html += `<strong>Nota:</strong> ${note}`;
+                html += `</div>`;
+            });
+        }
+
+        // Agregar ejemplos adicionales
+        if (content.examples && content.examples.length > 0) {
+            html += `<div class="lesson-examples">`;
+            html += `<h3 class="examples-title">Ejemplos:</h3>`;
+            content.examples.forEach(example => {
+                const englishText = example.english || '';
+                const escapeHtml = (text) => {
+                    return text.replace(/'/g, "&#39;").replace(/\"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                };
+                const safeWord = escapeHtml(englishText);
+                html += `<div class="example-item">`;
+                html += `<div class="example-english">${englishText}
+                            <button class="example-play-btn" title="Escuchar" data-word="${safeWord}" style="margin-left:8px;background:#60A5FA;border:none;border-radius:50%;width:28px;height:28px;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
+                        </div>`;
+                html += `<div class="example-translation">${example.translation || ''}</div>`;
+                html += `</div>`;
+            });
+            html += `</div>`;
+        }
+
+        html += `</div>`;
+
+        return html;
+    }
+
+    // Función para obtener el contenido de la lección basado en tema y subtema
+    function getLessonContent(tema, subtema) {
+        const temaLower = (tema || '').toLowerCase();
+        const subtemaLower = (subtema || '').toLowerCase();
+
+        // PRONOUNS - Personal Pronouns
+        if (temaLower.includes('pronoun') && subtemaLower.includes('personal')) {
+            return {
+                intro: 'Dentro de los pronombres personales, la lengua inglesa distingue entre pronombres en función de sujeto (subject pronouns) y pronombres en función de objeto (object pronouns).',
+                sections: [
+                    {
+                        title: 'Pronombres (en función de sujeto)',
+                        table: {
+                            headers: ['Pronombre', 'Traducción', 'Ejemplo'],
+                            rows: [
+                                ['I', 'yo', 'I am ill.<br>(Yo estoy enfermo.)'],
+                                ['you', 'tú, usted', 'You are tall.<br>(Tú eres alto. / Usted es alto.)'],
+                                ['he', 'él', 'He is handsome.<br>(Él es guapo.)'],
+                                ['she', 'ella', 'She is pretty.<br>(Ella es guapa.)'],
+                                ['it', 'ello (neutro)', 'It is cold today.<br>(Hoy hace frío.)'],
+                                ['we', 'nosotros', 'We are tired.<br>(Nosotros estamos cansados.)'],
+                                ['you', 'vosotros, ustedes', 'You are angry.<br>(Vosotros estáis enfadados. / Ustedes están enfadados.)'],
+                                ['they', 'ellos, ellas', 'They are at the cinema.<br>(Ellos están en el cine.)']
+                            ]
+                        },
+                        content: 'Los pronombres en función de sujeto se utilizan cuando el pronombre es el sujeto de la oración. Este pronombre en inglés, a diferencia del español, debe figurar siempre.'
+                    },
+                    {
+                        title: 'Pronombres (en función de objeto)',
+                        table: {
+                            headers: ['Pronombre', 'Traducción', 'Ejemplo'],
+                            rows: [
+                                ['me', 'mi', 'Can you help me?<br>(¿Puedes ayudarme?)'],
+                                ['you', 'a ti, a usted', 'I can help you.<br>(Puedo ayudarte. / Puedo ayudarle.)'],
+                                ['him', 'a él', 'Can you see him?<br>(¿Le puedes ver?)'],
+                                ['her', 'a ella', 'Give it to her.<br>(Dáselo a ella.)'],
+                                ['it', 'a ello', 'Give it a kick.<br>(Dale una patada.)'],
+                                ['us', 'a nosotros', 'Can you see us?<br>(¿Nos puedes ver?)'],
+                                ['you', 'a vosotros, a ustedes', 'I see you.<br>(Os veo. / Les veo.)'],
+                                ['them', 'a ellos', 'He can help them.<br>(Les puede ayudar.)']
+                            ]
+                        },
+                        content: 'Este pronombre se coloca a continuación del verbo al que complementa o a continuación de preposiciones como "for", "to", "with" y "at".'
+                    },
+                    {
+                        title: 'Function (Función)',
+                        content: `
+                            <p><strong>1. El pronombre en función de sujeto</strong></p>
+                            <p>El sujeto de una oración es la persona o cosa que realiza la acción del verbo. Se utilizan los pronombres en función de sujeto cuando el pronombre es el sujeto de la oración. Este pronombre en inglés, a diferencia del español, debe figurar siempre.</p>
+                            
+                            <p><strong>2. El pronombre en función de objeto</strong></p>
+                            <p>Este pronombre se coloca a continuación del verbo al que complementa o a continuación de preposiciones como "for", "to", "with" y "at".</p>
+                        `
+                    },
+                    {
+                        title: 'Neuter Form (Forma neutra)',
+                        content: 'Los pronombres en inglés distinguen entre masculino (he), femenino (she) y neutro (it). El pronombre personal "it" se utiliza cuando nos referimos a cosas, a animales que no sabemos su sexo o al tiempo (calendario y meteorológico). La forma plural de "it" es "they".',
+                        table: {
+                            headers: ['Ejemplo', 'Traducción'],
+                            rows: [
+                                ['Where is it [the book]?', '¿Dónde está [el libro]?'],
+                                ['What time is it?', '¿Qué hora es?'],
+                                ['It is raining.', 'Está lloviendo.']
+                            ]
+                        }
+                    }
+                ],
+                notes: [
+                    'En inglés no existe la forma "usted" o "ustedes" formal. Por lo tanto los nativos de la lengua ni siquiera lo tienen conceptualizado como una forma aquí llamada "formal". Se tiene que entender por tanto, que la forma masculina, femenina y neutra son lo mismo, lo único que las diferencia es el género.',
+                    'Además, ten en cuenta que en inglés sólo existe una forma para "tú" y "vosotros", "you", excepto en la forma reflexiva que distingue entre el singular (yourself) y plural (yourselves).',
+                    '"It" es una partícula muy importante en inglés de la que los hablantes de lengua española se suelen olvidar.'
+                ],
+                examples: [
+                    { english: 'I am ill.', translation: 'Yo estoy enfermo.' },
+                    { english: 'You are tall.', translation: 'Tú eres alto.' },
+                    { english: 'He is handsome.', translation: 'Él es guapo.' },
+                    { english: 'We are tired.', translation: 'Nosotros estamos cansados.' },
+                    { english: 'I can help you.', translation: 'Puedo ayudarte.' },
+                    { english: 'Can you see him?', translation: '¿Puedes verle?' },
+                    { english: 'He is going to the party with us.', translation: 'Él va a la fiesta con nosotros.' },
+                    { english: 'It [the letter] is for you.', translation: 'Es [la carta] para ti.' }
+                ]
+            };
+        }
+        
+        // READING COMPREHENSION
+        if (temaLower.includes('reading') || temaLower.includes('comprehension')) {
+            const passage = 'Emma lives in a small town near the mountains. Every morning, she wakes up early and walks her dog, Max, around the lake. After breakfast, she rides her bike to the library where she works. She loves helping people find books and recommends stories to children. On weekends, Emma visits her grandparents and they cook together. Her favorite dish is apple pie.';
+            return {
+                intro: 'Lee el texto y responde a las preguntas de comprensión lectora. Practica vocabulario y estructuras en contexto.',
+                sections: [
+                    {
+                        title: 'Texto',
+                        content: passage
+                    },
+                    {
+                        title: 'Preguntas de comprensión',
+                        table: {
+                            headers: ['Pregunta', 'Respuesta'],
+                            rows: [
+                                ['Where does Emma live?', 'She lives in a small town near the mountains.'],
+                                ['What does Emma do every morning?', 'She walks her dog, Max, around the lake.'],
+                                ['How does she go to the library?', 'She rides her bike.'],
+                                ['What does she love about her job?', 'Helping people find books and recommending stories to children.'],
+                                ['What does Emma do on weekends?', 'She visits her grandparents and they cook together.'],
+                                ['What is her favorite dish?', 'Apple pie.']
+                            ]
+                        }
+                    },
+                    {
+                        title: 'Vocabulario útil',
+                        table: {
+                            headers: ['Palabra/Frase', 'Significado', 'Ejemplo'],
+                            rows: [
+                                ['near the mountains', 'cerca de las montañas', 'They live near the mountains. (Viven cerca de las montañas.)'],
+                                ['walk the dog', 'pasear al perro', 'She walks the dog every morning. (Ella pasea al perro cada mañana.)'],
+                                ['ride a bike', 'andar en bicicleta', 'He rides a bike to work. (Él va al trabajo en bicicleta.)'],
+                                ['recommend', 'recomendar', 'I recommend this book. (Recomiendo este libro.)'],
+                                ['favorite dish', 'plato favorito', 'My favorite dish is pasta. (Mi plato favorito es la pasta.)']
+                            ]
+                        }
+                    }
+                ],
+                notes: [
+                    'Fíjate en el uso del presente simple para rutinas: wakes up, walks, rides, works, visits.'
+                ],
+                examples: [
+                    { english: 'She walks her dog every morning.', translation: 'Ella pasea a su perro cada mañana.' },
+                    { english: 'He rides a bike to work.', translation: 'Él va al trabajo en bicicleta.' },
+                    { english: 'This is my favorite dish.', translation: 'Este es mi plato favorito.' }
+                ]
+            };
+        }
+
+        // PRONOUNS - Possessives
+        if (temaLower.includes('pronoun') && subtemaLower.includes('possessiv')) {
+            return {
+                intro: 'Los posesivos en inglés se utilizan para indicar pertenencia o posesión. Existen dos tipos: adjetivos posesivos (possessive adjectives) y pronombres posesivos (possessive pronouns).',
+                sections: [
+                    {
+                        title: 'Adjetivos Posesivos (Possessive Adjectives)',
+                        table: {
+                            headers: ['Adjetivo', 'Traducción', 'Ejemplo'],
+                            rows: [
+                                ['my', 'mi, mis', 'my house<br>(mi casa)'],
+                                ['your', 'tu, tus', 'your pen<br>(tu pluma)'],
+                                ['his', 'su, sus (de él)', 'his car<br>(su coche)'],
+                                ['her', 'su, sus (de ella)', 'her book<br>(su libro)'],
+                                ['its', 'su, sus (de ello)', 'its tail<br>(su cola)'],
+                                ['our', 'nuestro/a/os/as', 'our friends<br>(nuestros amigos)'],
+                                ['your', 'vuestro/a/os/as', 'your school<br>(vuestra escuela)'],
+                                ['their', 'su, sus (de ellos)', 'their house<br>(su casa)']
+                            ]
+                        },
+                        content: 'Los adjetivos posesivos siempre van delante del sustantivo y lo modifican.'
+                    },
+                    {
+                        title: 'Pronombres Posesivos (Possessive Pronouns)',
+                        table: {
+                            headers: ['Pronombre', 'Traducción', 'Ejemplo'],
+                            rows: [
+                                ['mine', 'mío/a/os/as', 'The pen is mine.<br>(La pluma es mía.)'],
+                                ['yours', 'tuyo/a/os/as', 'This book is yours.<br>(Este libro es tuyo.)'],
+                                ['his', 'suyo/a/os/as (de él)', 'That car is his.<br>(Ese coche es suyo.)'],
+                                ['hers', 'suyo/a/os/as (de ella)', 'The bag is hers.<br>(La bolsa es suya.)'],
+                                ['ours', 'nuestro/a/os/as', 'The house is ours.<br>(La casa es nuestra.)'],
+                                ['yours', 'vuestro/a/os/as', 'These books are yours.<br>(Estos libros son vuestros.)'],
+                                ['theirs', 'suyo/a/os/as (de ellos)', 'Those dogs are theirs.<br>(Esos perros son suyos.)']
+                            ]
+                        },
+                        content: 'Los pronombres posesivos reemplazan al sustantivo y no necesitan ir acompañados de otro sustantivo.'
+                    }
+                ],
+                examples: [
+                    { english: "This is my house.", translation: 'Esta es mi casa.' },
+                    { english: "The book is mine.", translation: 'El libro es mío.' },
+                    { english: "Is this your pen?", translation: '¿Es esta tu pluma?' },
+                    { english: "This pen is yours.", translation: 'Esta pluma es tuya.' },
+                    { english: "Her car is red.", translation: 'Su coche es rojo.' },
+                    { english: "The red car is hers.", translation: 'El coche rojo es suyo.' }
+                ]
+            };
+        }
+
+        // PRONOUNS - Demonstrative Pronouns
+        if (temaLower.includes('pronoun') && subtemaLower.includes('demonstrativ')) {
+            return {
+                intro: 'Los pronombres demostrativos "demuestran" algo, como si estuviéramos señalando algo con el dedo. Se utilizan para indicar distancia o proximidad.',
+                sections: [
+                    {
+                        title: 'Pronombres Demostrativos',
+                        table: {
+                            headers: ['Pronombre', 'Uso', 'Ejemplo'],
+                            rows: [
+                                ['this', 'cerca (singular)', 'This book is mine.<br>(Este libro es mío.)'],
+                                ['that', 'lejos (singular)', 'That car is red.<br>(Ese coche es rojo.)'],
+                                ['these', 'cerca (plural)', 'These books are mine.<br>(Estos libros son míos.)'],
+                                ['those', 'lejos (plural)', 'Those cars are red.<br>(Esos coches son rojos.)']
+                            ]
+                        },
+                        content: 'Los pronombres demostrativos pueden funcionar como pronombres (reemplazando al sustantivo) o como adjetivos (modificando al sustantivo).'
+                    }
+                ],
+                examples: [
+                    { english: 'This is my house.', translation: 'Esta es mi casa.' },
+                    { english: 'That is his car.', translation: 'Ese es su coche.' },
+                    { english: 'These are my books.', translation: 'Estos son mis libros.' },
+                    { english: 'Those are their dogs.', translation: 'Esos son sus perros.' },
+                    { english: 'I want this one.', translation: 'Quiero este.' },
+                    { english: 'Can you see that?', translation: '¿Puedes ver eso?' }
+                ]
+            };
+        }
+
+        // PRONOUNS - Reflexive Pronouns
+        if (temaLower.includes('pronoun') && subtemaLower.includes('reflexiv')) {
+            return {
+                intro: 'Los pronombres reflexivos se utilizan cuando el sujeto hace la acción a sí mismo. En español equivalen a "me", "te", "se", "nos", "os" cuando indican acción reflexiva.',
+                sections: [
+                    {
+                        title: 'Pronombres Reflexivos',
+                        table: {
+                            headers: ['Pronombre', 'Traducción', 'Ejemplo'],
+                            rows: [
+                                ['myself', 'me (a mí mismo)', 'I cooked this myself.<br>(Yo cociné esto yo mismo.)'],
+                                ['yourself', 'te (a ti mismo)', 'You did it yourself.<br>(Tú lo hiciste tú mismo.)'],
+                                ['himself', 'se (a él mismo)', 'He washed himself.<br>(Él se lavó.)'],
+                                ['herself', 'se (a ella misma)', 'She dressed herself.<br>(Ella se vistió.)'],
+                                ['itself', 'se (a ello mismo)', 'The door opened itself.<br>(La puerta se abrió.)'],
+                                ['ourselves', 'nos (a nosotros mismos)', 'We enjoyed ourselves.<br>(Nos divertimos.)'],
+                                ['yourselves', 'os (a vosotros mismos)', 'You hurt yourselves.<br>(Os lastimasteis.)'],
+                                ['themselves', 'se (a ellos mismos)', 'They helped themselves.<br>(Ellos se ayudaron.)']
+                            ]
+                        },
+                        content: 'Los pronombres reflexivos siempre concuerdan con el sujeto de la oración. Se colocan después del verbo o después de preposiciones.'
+                    }
+                ],
+                examples: [
+                    { english: 'I cooked this myself.', translation: 'Yo cociné esto yo mismo.' },
+                    { english: 'She cut herself.', translation: 'Ella se cortó.' },
+                    { english: 'We enjoyed ourselves at the party.', translation: 'Nos divertimos en la fiesta.' },
+                    { english: 'They talk about themselves.', translation: 'Ellos hablan de sí mismos.' },
+                    { english: 'Be yourself!', translation: '¡Sé tú mismo!' },
+                    { english: 'I did it myself.', translation: 'Lo hice yo mismo.' }
+                ]
+            };
+        }
+
+        // ARTICLES - The Definite Article
+        if (temaLower.includes('article') && subtemaLower.includes('definit')) {
+            return {
+                intro: 'El artículo determinado en inglés es "the". Usamos "the" cuando nos referimos a un sustantivo específico o conocido tanto por el hablante como por el oyente.',
+                sections: [
+                    {
+                        title: 'Usos de "the"',
+                        content: `
+                            <p><strong>1. Sustantivos específicos conocidos:</strong> Usamos "the" cuando hablamos de algo específico que ambos conocen.</p>
+                            <p><strong>2. Cosas únicas:</strong> Para referirnos a cosas que solo hay una (el sol, la luna, etc.)</p>
+                            <p><strong>3. Segundo mencionado:</strong> Cuando mencionamos algo por segunda vez</p>
+                            <p><strong>4. Superlativos:</strong> Con adjetivos en grado superlativo</p>
+                            <p><strong>5. Nombres geográficos específicos:</strong> Con algunos nombres de lugares</p>
+                        `
+                    }
+                ],
+                examples: [
+                    { english: 'The book is on the table.', translation: 'El libro está en la mesa.' },
+                    { english: 'The sun is bright today.', translation: 'El sol está brillante hoy.' },
+                    { english: 'I bought a car. The car is red.', translation: 'Compré un coche. El coche es rojo.' },
+                    { english: 'She is the best student.', translation: 'Ella es la mejor estudiante.' },
+                    { english: 'The United States is big.', translation: 'Los Estados Unidos es grande.' },
+                    { english: 'Close the door, please.', translation: 'Cierra la puerta, por favor.' }
+                ],
+                notes: [
+                    '"The" se pronuncia diferente según la palabra que sigue: /ði/ antes de vocales y /ðə/ antes de consonantes.',
+                    'No usamos "the" con sustantivos plurales genéricos: "Dogs are friendly" (no "The dogs").'
+                ]
+            };
+        }
+
+        // ARTICLES - The Indefinite Article
+        if (temaLower.includes('article') && subtemaLower.includes('indefinit')) {
+            return {
+                intro: 'Los artículos indeterminados "a" y "an" se usan para referirse a algo indeterminado o no conocido. "A" se usa antes de consonantes y "an" antes de vocales.',
+                sections: [
+                    {
+                        title: 'Reglas de "a" y "an"',
+                        table: {
+                            headers: ['Artículo', 'Uso', 'Ejemplo'],
+                            rows: [
+                                ['a', 'Antes de consonantes', 'a car<br>(un coche)<br>a book<br>(un libro)'],
+                                ['an', 'Antes de vocales', 'an apple<br>(una manzana)<br>an elephant<br>(un elefante)'],
+                                ['a', 'Antes de "u" o "eu" que suenan como consonante', 'a university<br>(una universidad)<br>a European<br>(un europeo)'],
+                                ['an', 'Antes de "h" muda', 'an hour<br>(una hora)<br>an honor<br>(un honor)']
+                            ]
+                        },
+                        content: 'Usamos "a" o "an" solo con sustantivos contables en singular. Para plurales o sustantivos no contables usamos "some" o no usamos artículo.'
+                    }
+                ],
+                examples: [
+                    { english: 'I need a pen.', translation: 'Necesito un bolígrafo.' },
+                    { english: 'She has an umbrella.', translation: 'Ella tiene un paraguas.' },
+                    { english: 'He is a teacher.', translation: 'Él es un profesor.' },
+                    { english: 'It is an apple.', translation: 'Es una manzana.' },
+                    { english: 'I saw a cat in the garden.', translation: 'Vi un gato en el jardín.' },
+                    { english: 'An hour has passed.', translation: 'Ha pasado una hora.' }
+                ],
+                notes: [
+                    'La regla de "a" o "an" depende del SONIDO, no de la letra escrita. Por ejemplo: "an hour" porque la "h" es muda.',
+                    'No usamos "a" o "an" con sustantivos en plural o no contables.'
+                ]
+            };
+        }
+
+        // PREPOSITIONS
+        if (temaLower.includes('preposition')) {
+            if (subtemaLower.includes('place')) {
+                return {
+                    intro: 'Las preposiciones de lugar se utilizan para expresar dónde está un objeto o persona.',
+                    sections: [{
+                        title: 'Preposiciones de Lugar',
+                        table: {
+                            headers: ['Preposición', 'Uso', 'Ejemplo'],
+                            rows: [
+                                ['in', 'Dentro de (espacios cerrados)', 'The book is in the bag.<br>(El libro está en la bolsa.)'],
+                                ['on', 'Sobre, encima de (superficie)', 'The book is on the table.<br>(El libro está sobre la mesa.)'],
+                                ['at', 'En (puntos específicos)', 'She is at the door.<br>(Ella está en la puerta.)'],
+                                ['under', 'Debajo de', 'The cat is under the table.<br>(El gato está debajo de la mesa.)'],
+                                ['behind', 'Detrás de', 'The car is behind the house.<br>(El coche está detrás de la casa.)'],
+                                ['in front of', 'Delante de', 'I am in front of the school.<br>(Estoy delante de la escuela.)'],
+                                ['next to', 'Al lado de', 'She sits next to me.<br>(Ella se sienta al lado de mí.)'],
+                                ['between', 'Entre (dos cosas)', 'The cat is between the two dogs.<br>(El gato está entre los dos perros.)']
+                            ]
+                        }
+                    }],
+                    examples: [
+                        { english: 'The book is on the table.', translation: 'El libro está sobre la mesa.' },
+                        { english: 'I am at the school.', translation: 'Estoy en la escuela.' },
+                        { english: 'The ball is under the bed.', translation: 'La pelota está debajo de la cama.' }
+                    ]
+                };
+            }
+            if (subtemaLower.includes('time')) {
+                return {
+                    intro: 'Las preposiciones de tiempo se utilizan para expresar cuándo ocurre algo.',
+                    sections: [{
+                        title: 'Preposiciones de Tiempo',
+                        table: {
+                            headers: ['Preposición', 'Uso', 'Ejemplo'],
+                            rows: [
+                                ['in', 'Meses, años, estaciones', 'in January<br>in 2024<br>in summer<br>(en enero / en 2024 / en verano)'],
+                                ['on', 'Días de la semana, fechas', 'on Monday<br>on January 15th<br>(el lunes / el 15 de enero)'],
+                                ['at', 'Horas específicas', 'at 3 o\'clock<br>at noon<br>at midnight<br>(a las 3 / al mediodía / a medianoche)'],
+                                ['before', 'Antes de', 'before dinner<br>(antes de la cena)'],
+                                ['after', 'Después de', 'after school<br>(después de la escuela)'],
+                                ['during', 'Durante', 'during the class<br>(durante la clase)']
+                            ]
+                        }
+                    }],
+                    examples: [
+                        { english: 'I wake up at 7 o\'clock.', translation: 'Me despierto a las 7.' },
+                        { english: 'I have class on Monday.', translation: 'Tengo clase el lunes.' },
+                        { english: 'It rains in winter.', translation: 'Llueve en invierno.' }
+                    ]
+                };
+            }
+            if (subtemaLower.includes('movement') || subtemaLower.includes('direction')) {
+                return {
+                    intro: 'Las preposiciones de movimiento o dirección indican hacia dónde se mueve algo o alguien.',
+                    sections: [{
+                        title: 'Preposiciones de Movimiento',
+                        table: {
+                            headers: ['Preposición', 'Uso', 'Ejemplo'],
+                            rows: [
+                                ['to', 'Hacia, a (dirección)', 'Go to the store.<br>(Ve a la tienda.)'],
+                                ['into', 'Hacia dentro de', 'Come into the house.<br>(Entra a la casa.)'],
+                                ['out of', 'Fuera de', 'Get out of the car.<br>(Sal del coche.)'],
+                                ['through', 'A través de', 'Walk through the park.<br>(Camina a través del parque.)'],
+                                ['over', 'Sobre, por encima de', 'Jump over the fence.<br>(Salta sobre la valla.)'],
+                                ['across', 'A través de (superficie)', 'Walk across the street.<br>(Cruza la calle.)'],
+                                ['around', 'Alrededor de', 'Walk around the building.<br>(Camina alrededor del edificio.)']
+                            ]
+                        }
+                    }],
+                    examples: [
+                        { english: 'Go to the store.', translation: 'Ve a la tienda.' },
+                        { english: 'Jump over the fence.', translation: 'Salta sobre la valla.' },
+                        { english: 'Walk through the park.', translation: 'Camina a través del parque.' }
+                    ]
+                };
+            }
+            return {
+                intro: 'Las preposiciones "in", "at" y "on" se utilizan para expresar ubicación, posición, lugar o tiempo.',
+                sections: [{
+                    title: 'Preposiciones Comunes',
+                    content: 'Las preposiciones relacionan palabras en una oración y pueden indicar lugar, tiempo, dirección, etc.'
+                }],
+                examples: [
+                    { english: 'I am in the room.', translation: 'Estoy en la habitación.' },
+                    { english: 'She is at home.', translation: 'Ella está en casa.' },
+                    { english: 'The book is on the table.', translation: 'El libro está sobre la mesa.' }
+                ]
+            };
+        }
+
+        // NOUNS
+        if (temaLower.includes('noun')) {
+            if (subtemaLower.includes('proper')) {
+                return {
+                    intro: 'Los nombres propios son palabras específicas para una persona, lugar o cosa. Siempre empiezan con mayúscula.',
+                    sections: [{
+                        title: 'Nombres Propios',
+                        table: {
+                            headers: ['Tipo', 'Ejemplo'],
+                            rows: [
+                                ['Personas', 'John, Mary, David'],
+                                ['Lugares', 'London, New York, Spain'],
+                                ['Días/Meses', 'Monday, January, Christmas'],
+                                ['Marcas', 'Coca-Cola, Toyota, Apple']
+                            ]
+                        }
+                    }],
+                    examples: [
+                        { english: 'John lives in London.', translation: 'John vive en Londres.' },
+                        { english: 'I was born in January.', translation: 'Nací en enero.' },
+                        { english: 'Mary is from Spain.', translation: 'Mary es de España.' }
+                    ],
+                    notes: ['Los nombres propios siempre se escriben con mayúscula inicial, sin importar su posición en la oración.']
+                };
+            }
+            if (subtemaLower.includes('countable') || subtemaLower.includes('uncountable')) {
+                return {
+                    intro: 'Los sustantivos en inglés pueden ser contables (countable) o no contables (uncountable).',
+                    sections: [
+                        {
+                            title: 'Sustantivos Contables',
+                            content: 'Son sustantivos que se pueden contar. Tienen forma singular y plural.',
+                            table: {
+                                headers: ['Ejemplo'],
+                                rows: [
+                                    ['a book / books<br>(un libro / libros)'],
+                                    ['a car / cars<br>(un coche / coches)'],
+                                    ['an apple / apples<br>(una manzana / manzanas)']
+                                ]
+                            }
+                        },
+                        {
+                            title: 'Sustantivos No Contables',
+                            content: 'Son sustantivos que no se pueden contar. No tienen forma plural.',
+                            table: {
+                                headers: ['Ejemplo'],
+                                rows: [
+                                    ['water<br>(agua)'],
+                                    ['milk<br>(leche)'],
+                                    ['rice<br>(arroz)'],
+                                    ['information<br>(información)']
+                                ]
+                            }
+                        }
+                    ],
+                    examples: [
+                        { english: 'I have two books.', translation: 'Tengo dos libros.' },
+                        { english: 'I need some water.', translation: 'Necesito un poco de agua.' },
+                        { english: 'She has three cars.', translation: 'Ella tiene tres coches.' }
+                    ]
+                };
+            }
+            if (subtemaLower.includes('there') && subtemaLower.includes('be')) {
+                return {
+                    intro: '"There is" y "There are" se utilizan para indicar existencia. Equivalen a "hay" en español.',
+                    sections: [{
+                        title: 'There Be',
+                        table: {
+                            headers: ['Forma', 'Uso', 'Ejemplo'],
+                            rows: [
+                                ['There is', 'Singular', 'There is a cat.<br>(Hay un gato.)'],
+                                ['There are', 'Plural', 'There are four chairs.<br>(Hay cuatro sillas.)'],
+                                ['There isn\'t', 'Negativo singular', 'There isn\'t a dog.<br>(No hay un perro.)'],
+                                ['There aren\'t', 'Negativo plural', 'There aren\'t any books.<br>(No hay libros.)']
+                            ]
+                        }
+                    }],
+                    examples: [
+                        { english: 'There is a cat in the garden.', translation: 'Hay un gato en el jardín.' },
+                        { english: 'There are four chairs in the room.', translation: 'Hay cuatro sillas en la habitación.' },
+                        { english: 'Is there a pen?', translation: '¿Hay un bolígrafo?' }
+                    ]
+                };
+            }
+            if (subtemaLower.includes('quantifier')) {
+                return {
+                    intro: 'Los cuantificadores indican cantidad de sustantivos contables o no contables.',
+                    sections: [{
+                        title: 'Cuantificadores',
+                        table: {
+                            headers: ['Cuantificador', 'Uso', 'Ejemplo'],
+                            rows: [
+                                ['some', 'Afirmativo (contables/ no contables)', 'I have some eggs.<br>I need some water.'],
+                                ['any', 'Negativo e interrogativo', 'I don\'t have any eggs.<br>Do you have any water?'],
+                                ['many', 'Plural contables', 'I have many books.'],
+                                ['much', 'No contables', 'I don\'t have much time.'],
+                                ['a lot of', 'Muchos/as', 'She has a lot of friends.'],
+                                ['few', 'Pocos (contables)', 'I have few books.'],
+                                ['little', 'Poco (no contables)', 'I have little time.']
+                            ]
+                        }
+                    }],
+                    examples: [
+                        { english: 'Have you got any eggs?', translation: '¿Tienes huevos?' },
+                        { english: 'Yes, there are some in the fridge.', translation: 'Sí, hay algunos en la nevera.' },
+                        { english: 'I have many friends.', translation: 'Tengo muchos amigos.' }
+                    ]
+                };
+            }
+        }
+
+        // VERBS - To Be
+        if (temaLower.includes('verb') && subtemaLower.includes('be')) {
+            return {
+                intro: 'El verbo "to be" (ser/estar) es uno de los más importantes en inglés. Tiene diferentes formas según el sujeto y el tiempo.',
+                sections: [
+                    {
+                        title: 'Presente (Present)',
+                        table: {
+                            headers: ['Sujeto', 'Forma', 'Ejemplo'],
+                            rows: [
+                                ['I', 'am', 'I am a teacher.<br>(Soy un profesor.)'],
+                                ['you', 'are', 'You are tall.<br>(Tú eres alto.)'],
+                                ['he/she/it', 'is', 'He is my friend.<br>(Él es mi amigo.)'],
+                                ['we/you/they', 'are', 'We are students.<br>(Somos estudiantes.)']
+                            ]
+                        }
+                    },
+                    {
+                        title: 'Pasado (Past)',
+                        table: {
+                            headers: ['Sujeto', 'Forma', 'Ejemplo'],
+                            rows: [
+                                ['I/he/she/it', 'was', 'I was happy yesterday.<br>(Estaba feliz ayer.)'],
+                                ['we/you/they', 'were', 'We were at school.<br>(Estábamos en la escuela.)']
+                            ]
+                        }
+                    },
+                    {
+                        title: 'Participio Pasado (Past Participle)',
+                        table: {
+                            headers: ['Forma', 'Ejemplo'],
+                            rows: [
+                                ['been', 'I have been blessed.<br>(He sido bendecido.)'],
+                                ['been', 'They have been working.<br>(Han estado trabajando.)']
+                            ]
+                        }
+                    }
+                ],
+                examples: [
+                    { english: 'I am a teacher.', translation: 'Soy un profesor.' },
+                    { english: 'She is happy.', translation: 'Ella está feliz.' },
+                    { english: 'They are friends.', translation: 'Ellos son amigos.' },
+                    { english: 'I was a child.', translation: 'Yo era un niño.' },
+                    { english: 'We were students.', translation: 'Nosotros éramos estudiantes.' },
+                    { english: 'I have been waiting.', translation: 'He estado esperando.' }
+                ]
+            };
+        }
+
+        // VERBS - Modal Verbs
+        if (temaLower.includes('verb') && subtemaLower.includes('modal')) {
+            return {
+                intro: 'Los verbos modales expresan posibilidad, permiso, obligación, habilidad, etc. Van seguidos del infinitivo sin "to".',
+                sections: [{
+                    title: 'Verbos Modales Comunes',
+                    table: {
+                        headers: ['Modal', 'Uso', 'Ejemplo'],
+                        rows: [
+                            ['can', 'Habilidad, permiso', 'She can play the piano.<br>(Ella puede tocar el piano.)'],
+                            ['could', 'Posibilidad pasada, cortesía', 'I could help you.<br>(Podría ayudarte.)'],
+                            ['may', 'Posibilidad, permiso', 'May I come in?<br>(¿Puedo entrar?)'],
+                            ['might', 'Posibilidad débil', 'I might buy this.<br>(Podría comprar esto.)'],
+                            ['must', 'Obligación, deducción', 'You must study.<br>(Debes estudiar.)'],
+                            ['should', 'Recomendación, consejo', 'You should rest.<br>(Deberías descansar.)'],
+                            ['will', 'Futuro, voluntad', 'I will help you.<br>(Te ayudaré.)'],
+                            ['would', 'Cortesía, condicional', 'Would you help me?<br>(¿Me ayudarías?)']
+                        ]
+                    }
+                }],
+                examples: [
+                    { english: 'She can play the piano.', translation: 'Ella puede tocar el piano.' },
+                    { english: 'I might buy this.', translation: 'Podría comprar esto.' },
+                    { english: 'You must study.', translation: 'Debes estudiar.' },
+                    { english: 'You should rest.', translation: 'Deberías descansar.' }
+                ],
+                notes: ['Los verbos modales no cambian según el sujeto (no tienen -s en tercera persona) y van seguidos del infinitivo sin "to".']
+            };
+        }
+
+        // ADJECTIVES
+        if (temaLower.includes('adjective')) {
+            return {
+                intro: 'Los adjetivos describen o modifican a los nombres. Van delante del sustantivo o después de verbos como "be".',
+                sections: [{
+                    title: 'Adjetivos Comunes',
+                    table: {
+                        headers: ['Adjetivo', 'Traducción', 'Ejemplo'],
+                        rows: [
+                            ['big', 'grande', 'a big house<br>(una casa grande)'],
+                            ['small', 'pequeño', 'a small car<br>(un coche pequeño)'],
+                            ['tall', 'alto', '2 tall men<br>(2 hombres altos)'],
+                            ['short', 'bajo, corto', 'short hair<br>(pelo corto)'],
+                            ['long', 'largo', 'long hair<br>(pelo largo)'],
+                            ['good', 'bueno', 'a good student<br>(un buen estudiante)'],
+                            ['bad', 'malo', 'bad weather<br>(mal tiempo)'],
+                            ['happy', 'feliz', 'a happy child<br>(un niño feliz)'],
+                            ['sad', 'triste', 'a sad story<br>(una historia triste)']
+                        ]
+                    }
+                }],
+                examples: [
+                    { english: 'A big house.', translation: 'Una casa grande.' },
+                    { english: 'Two tall men.', translation: 'Dos hombres altos.' },
+                    { english: 'She has long hair.', translation: 'Ella tiene pelo largo.' },
+                    { english: 'The house is big.', translation: 'La casa es grande.' }
+                ],
+                notes: ['En inglés, el adjetivo siempre va ANTES del sustantivo (no después como en español).']
+            };
+        }
+
+        // PRESENT TENSES
+        if (temaLower.includes('present')) {
+            if (subtemaLower.includes('simple')) {
+                return {
+                    intro: 'El presente simple se usa para acciones rutinarias, hechos generales, verdades universales y estados permanentes.',
+                    sections: [{
+                        title: 'Presente Simple',
+                        table: {
+                            headers: ['Sujeto', 'Forma', 'Ejemplo'],
+                            rows: [
+                                ['I/you/we/they', 'Infinitivo', 'I speak English.<br>(Hablo inglés.)'],
+                                ['he/she/it', 'Infinitivo + s', 'He works at a factory.<br>(Él trabaja en una fábrica.)'],
+                                ['Negativo', 'don\'t/doesn\'t + infinitivo', 'I don\'t speak French.<br>She doesn\'t work here.'],
+                                ['Interrogativo', 'Do/Does + sujeto + infinitivo', 'Do you speak English?<br>Does he work here?']
+                            ]
+                        }
+                    }],
+                    examples: [
+                        { english: 'I speak English.', translation: 'Hablo inglés.' },
+                        { english: 'He works at a factory.', translation: 'Él trabaja en una fábrica.' },
+                        { english: 'We eat breakfast every day.', translation: 'Desayunamos todos los días.' },
+                        { english: 'The sun rises in the east.', translation: 'El sol sale por el este.' }
+                    ]
+                };
+            }
+            if (subtemaLower.includes('continuous')) {
+                return {
+                    intro: 'El presente continuo se usa para acciones que están ocurriendo ahora, en el momento del habla.',
+                    sections: [{
+                        title: 'Presente Continuo',
+                        table: {
+                            headers: ['Forma', 'Ejemplo'],
+                            rows: [
+                                ['am/is/are + gerundio', 'I am wearing a blue jacket.<br>(Estoy usando una chaqueta azul.)'],
+                                ['Negativo: am/is/are + not + gerundio', 'She is not sleeping.<br>(Ella no está durmiendo.)'],
+                                ['Interrogativo: Am/Is/Are + sujeto + gerundio', 'Are you studying?<br>(¿Estás estudiando?)']
+                            ]
+                        }
+                    }],
+                    examples: [
+                        { english: 'I am wearing a blue jacket.', translation: 'Estoy usando una chaqueta azul.' },
+                        { english: 'She is sleeping now.', translation: 'Ella está durmiendo ahora.' },
+                        { english: 'They are studying English.', translation: 'Ellos están estudiando inglés.' },
+                        { english: 'We are having lunch.', translation: 'Estamos almorzando.' }
+                    ],
+                    notes: ['El presente continuo se forma con "am/is/are" + verbo en gerundio (-ing).']
+                };
+            }
+        }
+
+        // NUMBERS, DATES, TIME
+        if (temaLower.includes('number') || temaLower.includes('date') || temaLower.includes('time')) {
+            if (subtemaLower.includes('cardinal')) {
+                return {
+                    intro: 'Los números cardinales se usan para contar.',
+                    sections: [{
+                        title: 'Números Cardinales',
+                        table: {
+                            headers: ['Número', 'Escritura'],
+                            rows: [
+                                ['1-10', 'one, two, three, four, five, six, seven, eight, nine, ten'],
+                                ['11-20', 'eleven, twelve, thirteen, fourteen, fifteen, sixteen, seventeen, eighteen, nineteen, twenty'],
+                                ['20-100', 'twenty, thirty, forty, fifty, sixty, seventy, eighty, ninety, one hundred']
+                            ]
+                        }
+                    }],
+                    examples: [
+                        { english: 'I have five apples.', translation: 'Tengo cinco manzanas.' },
+                        { english: 'She is twenty years old.', translation: 'Ella tiene veinte años.' },
+                        { english: 'There are one hundred books.', translation: 'Hay cien libros.' }
+                    ]
+                };
+            }
+            if (subtemaLower.includes('ordinal')) {
+                return {
+                    intro: 'Los números ordinales indican posición u orden.',
+                    sections: [{
+                        title: 'Números Ordinales',
+                        table: {
+                            headers: ['Posición', 'Ordinal'],
+                            rows: [
+                                ['1st', 'first<br>(primero)'],
+                                ['2nd', 'second<br>(segundo)'],
+                                ['3rd', 'third<br>(tercero)'],
+                                ['4th', 'fourth<br>(cuarto)'],
+                                ['5th', 'fifth<br>(quinto)']
+                            ]
+                        }
+                    }],
+                    examples: [
+                        { english: 'Tom is first, Sally is second.', translation: 'Tom es primero, Sally es segunda.' },
+                        { english: 'This is my third visit.', translation: 'Esta es mi tercera visita.' }
+                    ]
+                };
+            }
+            if (subtemaLower.includes('date')) {
+                return {
+                    intro: 'Las fechas en inglés se expresan de forma diferente al español.',
+                    sections: [{
+                        title: 'Formato de Fechas',
+                        content: 'En inglés americano: Mes + día + año<br>En inglés británico: Día + mes + año'
+                    }],
+                    examples: [
+                        { english: 'Today is the 14th of December.', translation: 'Hoy es el 14 de diciembre.' },
+                        { english: 'My birthday is January 15th.', translation: 'Mi cumpleaños es el 15 de enero.' }
+                    ]
+                };
+            }
+            if (subtemaLower.includes('time')) {
+                return {
+                    intro: 'Cómo expresar la hora en inglés.',
+                    sections: [{
+                        title: 'Expresiones de Tiempo',
+                        table: {
+                            headers: ['Formato', 'Ejemplo'],
+                            rows: [
+                                ['What time is it?', '¿Qué hora es?'],
+                                ['It\'s four o\'clock.', 'Son las cuatro.'],
+                                ['It\'s half past three.', 'Son las tres y media.'],
+                                ['It\'s quarter past two.', 'Son las dos y cuarto.'],
+                                ['It\'s quarter to five.', 'Son las cinco menos cuarto.']
+                            ]
+                        }
+                    }],
+                    examples: [
+                        { english: 'What time is it?', translation: '¿Qué hora es?' },
+                        { english: 'It\'s four o\'clock.', translation: 'Son las cuatro.' },
+                        { english: 'It\'s half past three.', translation: 'Son las tres y media.' }
+                    ]
+                };
+            }
+        }
+
+        // Si no hay contenido específico, devolver contenido genérico
+        return {
+            intro: 'Contenido de la lección',
+            sections: [],
+            notes: [],
+            examples: []
+        };
+    }
+
+    // Función para parsear la descripción de la lección
+    function parseLessonDescription(descripcion) {
+        const result = {
+            intro: '',
+            sections: [],
+            notes: [],
+            examples: []
+        };
+
+        if (!descripcion) return result;
+
+        // Dividir por líneas
+        const lines = descripcion.split('\n').map(line => line.trim()).filter(line => line);
+
+        let currentSection = null;
+        let inTable = false;
+        let tableHeaders = [];
+        let tableRows = [];
+        let currentTableRow = [];
+        let currentExample = {};
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const nextLine = i < lines.length - 1 ? lines[i + 1] : '';
+
+            // Detectar secciones/títulos (líneas seguidas de guiones o que terminan en :)
+            if (line.includes('\t') || line.match(/^[A-ZÁÉÍÓÚÑ][^:]*(:|$)/)) {
+                // Si es una tabla (contiene tabs)
+                if (line.includes('\t')) {
+                    if (!inTable) {
+                        inTable = true;
+                        // Primera línea puede ser el encabezado
+                        if (line.split('\t').length > 2) {
+                            tableHeaders = line.split('\t').filter(h => h.trim());
+                        }
+                    }
+                    
+                    const cells = line.split('\t').filter(c => c.trim());
+                    if (cells.length > 0) {
+                        tableRows.push(cells);
+                    }
+                } else if (line.match(/^[A-ZÁÉÍÓÚÑ][^:]*:$/)) {
+                    // Es un título de sección
+                    if (currentSection && inTable) {
+                        currentSection.table = {
+                            headers: tableHeaders.length > 0 ? tableHeaders : ['Concepto', 'Ejemplo'],
+                            rows: tableRows
+                        };
+                        result.sections.push(currentSection);
+                        inTable = false;
+                        tableHeaders = [];
+                        tableRows = [];
+                    }
+                    
+                    currentSection = {
+                        title: line.replace(':', ''),
+                        content: '',
+                        table: null
+                    };
+                } else if (line.startsWith('Nota:')) {
+                    // Es una nota
+                    result.notes.push(line.replace(/^Nota:\s*/i, ''));
+                } else if (currentSection && !inTable) {
+                    // Agregar contenido a la sección actual
+                    currentSection.content += (currentSection.content ? '<br>' : '') + line;
+                }
+            } else {
+                // Línea normal de contenido
+                if (line.includes('(') && line.includes(')')) {
+                    // Puede ser un ejemplo en formato "English (Spanish)"
+                    const match = line.match(/^(.+?)\s*\(([^)]+)\)$/);
+                    if (match) {
+                        currentExample.english = match[1].trim();
+                        currentExample.translation = match[2].trim();
+                        result.examples.push(currentExample);
+                        currentExample = {};
+                    }
+                } else if (!currentSection) {
+                    // Es parte de la introducción
+                    result.intro += (result.intro ? '<br><br>' : '') + line;
+                } else if (!inTable) {
+                    currentSection.content += (currentSection.content ? '<br>' : '') + line;
+                }
+            }
+
+            // Si la siguiente línea no es una tabla y estamos en modo tabla, cerrar tabla
+            if (inTable && nextLine && !nextLine.includes('\t') && !nextLine.match(/^[A-ZÁÉÍÓÚÑ][^:]*:$/)) {
+                if (currentSection) {
+                    currentSection.table = {
+                        headers: tableHeaders.length > 0 ? tableHeaders : ['Concepto', 'Ejemplo'],
+                        rows: tableRows
+                    };
+                }
+                inTable = false;
+                tableHeaders = [];
+                tableRows = [];
+            }
+        }
+
+        // Cerrar sección pendiente
+        if (currentSection) {
+            if (inTable && tableRows.length > 0) {
+                currentSection.table = {
+                    headers: tableHeaders.length > 0 ? tableHeaders : ['Concepto', 'Ejemplo'],
+                    rows: tableRows
+                };
+            }
+            result.sections.push(currentSection);
+        }
+
+        return result;
+    }
+
+    // Función para cerrar la vista de lección detallada
+    function closeLessonDetail() {
+        const lessonDetailSection = document.querySelector('.lesson-detail-section');
+        if (lessonDetailSection) {
+            lessonDetailSection.style.display = 'none';
+            // Resetear scroll para la próxima apertura
+            try { lessonDetailSection.scrollTop = 0; } catch (_) {}
+        }
+
+        // Volver a mostrar sección de práctica
+        const practiceSection = document.querySelector('.practice-section');
+        if (practiceSection) {
+            practiceSection.style.display = 'block';
+            // Asegurar que práctica comience arriba
+            try { practiceSection.scrollTop = 0; } catch (_) {}
+            const practiceContainer = document.querySelector('.practice-container');
+            if (practiceContainer) {
+                try { practiceContainer.scrollTop = 0; } catch (_) {}
+            }
+            try { window.scrollTo({ top: 0, behavior: 'instant' }); } catch (_) { try { window.scrollTo(0, 0); } catch (_) {} }
+        }
+    }
+
+    // Event listeners para cerrar/volver de la lección (se asignan cuando se crea el contenido)
+    function setupLessonEventListeners() {
+        const lessonCloseBtn = document.getElementById('lessonCloseBtn');
+        const lessonBackBtn = document.getElementById('lessonBackBtn');
+        const lessonContent = document.getElementById('lessonContent');
+
+        if (lessonCloseBtn) {
+            lessonCloseBtn.addEventListener('click', function() {
+                closeLessonDetail();
+            });
+        }
+
+        if (lessonBackBtn) {
+            lessonBackBtn.addEventListener('click', function() {
+                closeLessonDetailPreserve();
+            });
+        }
+
+        // Configurar event delegation para botones de audio en las tablas
+        if (lessonContent) {
+            // Remover listener anterior si existe
+            lessonContent.removeEventListener('click', handleTableAudioClick);
+            // Agregar nuevo listener usando event delegation
+            lessonContent.addEventListener('click', handleTableAudioClick);
+        }
+    }
+
+    // Función manejadora de clics para botones de audio en tablas
+    function handleTableAudioClick(e) {
+        // Verificar si el clic fue en un botón de audio (tablas o ejemplos)
+        const button = e.target.closest('.table-play-btn, .example-play-btn');
+        if (button) {
+            const word = button.getAttribute('data-word');
+            if (word && window.speakWord) {
+                // Decodificar HTML entities
+                const decodedWord = word
+                    .replace(/&#39;/g, "'")
+                    .replace(/&quot;/g, '"')
+                    .replace(/&lt;/g, '<')
+                    .replace(/&gt;/g, '>');
+                window.speakWord(decodedWord);
+            }
+        }
+    }
+
+    // Cerrar la vista de lección sin reiniciar scroll ni recargar práctica
+    function closeLessonDetailPreserve() {
+        const lessonDetailSection = document.querySelector('.lesson-detail-section');
+        if (lessonDetailSection) {
+            lessonDetailSection.style.display = 'none';
+        }
+        const practiceSection = document.querySelector('.practice-section');
+        if (practiceSection) {
+            practiceSection.style.display = 'block';
         }
     }
 
@@ -1578,6 +3052,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadVerbsList(false);
             }, 1000);
         }
+
+        // Precargar lecciones dinámicas al entrar a la app (una sola vez)
+        setTimeout(() => {
+            if (typeof loadLessons === 'function') {
+                loadLessons();
+            }
+        }, 800);
     }
 
     // Verificar login al cargar

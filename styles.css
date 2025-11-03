@@ -87,14 +87,14 @@ body {
 
 /* Banner de la Lección */
 .lesson-banner {
-    background: linear-gradient(135deg, #FDA100, #E89200);
+    background: #61c906;
     border-radius: 16px;
     padding: 25px 31px;
     min-height: 100px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 12px rgba(253, 161, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(97, 201, 6, 0.3);
     flex-shrink: 0;
 }
 
@@ -282,6 +282,22 @@ body {
     overflow: hidden;
 }
 
+/* Quitar sombra bajo los módulos completados */
+.lesson-module.completed,
+.lesson-module.completed:hover {
+    box-shadow: none !important;
+}
+
+/* Quitar sombra bajo módulos current, story y locked (normal y hover) */
+.lesson-module.current,
+.lesson-module.current:hover,
+.lesson-module.story,
+.lesson-module.story:hover,
+.lesson-module.locked,
+.lesson-module.locked:hover {
+    box-shadow: none !important;
+}
+
 .lesson-module.completed::before {
     content: '';
     position: absolute;
@@ -397,6 +413,16 @@ body {
     filter: none;
 }
 
+/* Subir 5% los íconos de módulos completados */
+.lesson-module.completed i {
+    transform: translateY(-8%);
+}
+
+/* Subir 7% el ícono de historias (libro) */
+.lesson-module.story i {
+    transform: translateY(-7%);
+}
+
 .lesson-number {
     position: absolute;
     bottom: -8px;
@@ -463,14 +489,17 @@ body {
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    filter: grayscale(0.3) brightness(0.8) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
     transform-style: preserve-3d;
 }
 
 .treasure-chest:hover {
     transform: scale(1.15) translateZ(20px) rotateX(-8deg) rotateY(-5deg);
-    filter: grayscale(0) brightness(1.3) drop-shadow(0 15px 30px rgba(255, 215, 0, 0.7));
+    filter: drop-shadow(0 15px 30px rgba(255, 215, 0, 0.7));
 }
+
+/* Asegurar colores originales de la imagen del cofre */
+.treasure-chest img { filter: none; }
 
 /* Cabeza de Duo en módulo actual */
 .duo-head {
@@ -2818,5 +2847,271 @@ body {
     .verb-play-btn {
         padding: 16px;
         font-size: 16px;
+    }
+}
+
+/* ===== SECCIÓN DE LECCIÓN DETALLADA ===== */
+.lesson-detail-section {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #1F2937;
+    z-index: 9998;
+    overflow-y: auto;
+    padding: 20px;
+    padding-top: 80px;
+    padding-bottom: 100px;
+}
+
+.lesson-detail-container {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.lesson-close-btn {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background-color: #374151;
+    border: none;
+    color: white;
+    font-size: 24px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: all 0.3s ease;
+}
+
+.lesson-close-btn:hover {
+    background-color: #4B5563;
+    transform: scale(1.1);
+}
+
+.lesson-back-btn {
+    position: fixed;
+    top: 80px;
+    left: 20px;
+    background-color: #374151;
+    border: none;
+    color: white;
+    font-size: 16px;
+    padding: 12px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 9999;
+    transition: all 0.3s ease;
+}
+
+.lesson-back-btn:hover {
+    background-color: #4B5563;
+    transform: translateX(-5px);
+}
+
+.lesson-content {
+    background-color: #374151;
+    border-radius: 20px;
+    padding: 40px;
+    margin-top: 60px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.lesson-header {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #4B5563;
+}
+
+.lesson-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.lesson-main-title {
+    font-size: 36px;
+    font-weight: bold;
+    color: white;
+    margin: 12px 0;
+}
+
+.lesson-subtitle {
+    font-size: 24px;
+    color: #9CA3AF;
+    margin: 0;
+}
+
+.lesson-body {
+    margin-top: 30px;
+}
+
+.lesson-intro {
+    font-size: 18px;
+    line-height: 1.8;
+    color: #E5E7EB;
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #4B5563;
+    border-radius: 12px;
+    border-left: 4px solid #3B82F6;
+}
+
+.lesson-section {
+    margin-bottom: 40px;
+}
+
+.section-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #4B5563;
+}
+
+.section-content {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #E5E7EB;
+    margin-top: 15px;
+}
+
+.lesson-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: #4B5563;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.lesson-table thead {
+    background-color: #3B82F6;
+}
+
+.lesson-table th {
+    padding: 16px;
+    text-align: left;
+    font-weight: bold;
+    color: white;
+    font-size: 16px;
+}
+
+.lesson-table td {
+    padding: 16px;
+    border-top: 1px solid #6B7280;
+    color: #E5E7EB;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.lesson-table tr:hover {
+    background-color: #5B6673;
+}
+
+.lesson-note {
+    background-color: #FEF3C7;
+    color: #78350F;
+    padding: 16px 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    border-left: 4px solid #F59E0B;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.lesson-note strong {
+    color: #92400E;
+}
+
+.lesson-examples {
+    margin-top: 30px;
+}
+
+.examples-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.example-item {
+    background-color: #4B5563;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    border-left: 4px solid #10B981;
+}
+
+.example-english {
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.example-translation {
+    font-size: 16px;
+    color: #9CA3AF;
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .lesson-detail-section {
+        padding: 16px;
+        padding-top: 60px;
+    }
+
+    .lesson-content {
+        padding: 24px;
+        margin-top: 40px;
+    }
+
+    .lesson-main-title {
+        font-size: 28px;
+    }
+
+    .lesson-subtitle {
+        font-size: 20px;
+    }
+
+    .section-title {
+        font-size: 22px;
+    }
+
+    .lesson-table {
+        font-size: 14px;
+    }
+
+    .lesson-table th,
+    .lesson-table td {
+        padding: 12px;
+    }
+
+    .lesson-close-btn {
+        top: 60px;
+        right: 16px;
+    }
+
+    .lesson-back-btn {
+        top: 60px;
+        left: 16px;
+        padding: 10px 16px;
+        font-size: 14px;
     }
 }
